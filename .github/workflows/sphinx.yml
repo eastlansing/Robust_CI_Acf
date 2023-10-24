@@ -1,8 +1,9 @@
-name: Build and Deploy Documentation
+name: Build and Deploy Sphinx Documentation
+
 on:
   push:
     branches:
-      - main  # adjust with your default branch
+      - main  # Or replace with the name of your default branch if it's not "main"
 
 jobs:
   build-and-deploy:
@@ -19,15 +20,16 @@ jobs:
       - name: Install Dependencies
         run: |
           pip install sphinx
-          pip install sphinx_rtd_theme  # or any other theme you prefer
+          pip install sphinx_rtd_theme
+          pip install sphinxcontrib-napoleon  # For parsing NumPy-style docstrings
 
       - name: Build Documentation
-        run: |
-          cd docs
-          sphinx-build -b html . _build/html
+        run: make html
+        working-directory: docs
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GH_PAT }}
-          publish_dir: ./docs/_build/html
+          publish_dir: docs/_build/html
+
