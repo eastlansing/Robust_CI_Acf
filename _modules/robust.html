@@ -69,19 +69,38 @@
 <div class="viewcode-block" id="HAC_robust_conf_int"><a class="viewcode-back" href="../module_robust.html#robust.HAC_robust_conf_int">[docs]</a><span></span><span class="k">class</span> <span class="nc">HAC_robust_conf_int</span><span class="p">:</span>
 <span class="w">    </span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    This is test</span>
+<span class="sd">    Implements the Heteroskedasticity and Autocorrelation Consistent (HAC) robust confidence intervals for autocorrelation analysis.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
+<span class="sd">    data : array-like</span>
+<span class="sd">        The input data series for which the HAC robust confidence intervals are to be calculated.</span>
+<span class="sd">    </span>
+<span class="sd">    lag : int</span>
+<span class="sd">        The maximum lag to be considered for autocorrelation.</span>
+<span class="sd">    </span>
+<span class="sd">    null_imp : bool, default=True</span>
+<span class="sd">        Indicates if the null hypothesis of no importance should be considered.</span>
+<span class="sd">    </span>
+<span class="sd">    method : str, default=&#39;fixedb&#39;</span>
+<span class="sd">        The method used for estimation.</span>
+<span class="sd">    </span>
+<span class="sd">    bandwidth : str, default=&quot;SPJ&quot;</span>
+<span class="sd">        Specifies the bandwidth method used in the estimation.</span>
+<span class="sd">    </span>
+<span class="sd">    time_trend : bool, default=False</span>
+<span class="sd">        If True, a time trend is considered in the model.</span>
+<span class="sd">    </span>
+<span class="sd">    diff : bool, default=False</span>
+<span class="sd">        If True, calculates the difference series of the data.</span>
+<span class="sd">    </span>
+<span class="sd">    alpha : float, default=0.05</span>
+<span class="sd">        Significance level for the confidence interval.</span>
 
-<span class="sd">    n_factors : int, default=1</span>
-<span class="sd">        abcd</span>
+<span class="sd">    Note</span>
+<span class="sd">    ----</span>
+<span class="sd">    Ensure that the provided parameters, especially &#39;method&#39; and &#39;bandwidth&#39;, align with the domain-specific options available. The provided options are for demonstration purposes and may need further refinement.</span>
 
-<span class="sd">    intercept : boolean, default=False</span>
-<span class="sd">        abd</span>
-
-<span class="sd">    max_iter : int, default=10000</span>
-<span class="sd">        abcd</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     
 <div class="viewcode-block" id="HAC_robust_conf_int.__init__"><a class="viewcode-back" href="../module_robust.html#robust.HAC_robust_conf_int.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">lag</span><span class="p">,</span> <span class="n">null_imp</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;fixedb&#39;</span><span class="p">,</span> <span class="n">bandwidth</span><span class="o">=</span><span class="s2">&quot;SPJ&quot;</span><span class="p">,</span> <span class="n">time_trend</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">diff</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.05</span><span class="p">):</span>
