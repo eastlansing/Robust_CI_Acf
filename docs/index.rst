@@ -4,11 +4,10 @@
 Welcome to Robust_CI_Acf's documentation!
 =========================================
 
-.. toctree::
-   :maxdepth: 2
-   :caption: Contents:
-
-   module_robust  # This will link to module_robust.rst
+.. automodule:: robust
+    :members:
+    :undoc-members:
+    :show-inheritance:
 
 Indices and tables
 ==================
@@ -16,4 +15,5 @@ Indices and tables
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
+
 
