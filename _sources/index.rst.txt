@@ -3,6 +3,7 @@
 
 Welcome to Robust_CI_Acf's documentation!
 =========================================
+This package provides a Python (3.6+) implementation of the HAC robust confidence interval by Hwang and Vogelsang (2023)
 
 .. automodule:: robust
     :members:
