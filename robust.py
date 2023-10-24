@@ -1,19 +1,38 @@
 class HAC_robust_conf_int:
     
     """
-    This is test
+    Implements the Heteroskedasticity and Autocorrelation Consistent (HAC) robust confidence intervals for autocorrelation analysis.
 
     Parameters
     ----------
+    data : array-like
+        The input data series for which the HAC robust confidence intervals are to be calculated.
+    
+    lag : int
+        The maximum lag to be considered for autocorrelation.
+    
+    null_imp : bool, default=True
+        Indicates if the null hypothesis of no importance should be considered.
+    
+    method : str, default='fixedb'
+        The method used for estimation.
+    
+    bandwidth : str, default="SPJ"
+        Specifies the bandwidth method used in the estimation.
+    
+    time_trend : bool, default=False
+        If True, a time trend is considered in the model.
+    
+    diff : bool, default=False
+        If True, calculates the difference series of the data.
+    
+    alpha : float, default=0.05
+        Significance level for the confidence interval.
 
-    n_factors : int, default=1
-        abcd
+    Note
+    ----
+    Ensure that the provided parameters, especially 'method' and 'bandwidth', align with the domain-specific options available. The provided options are for demonstration purposes and may need further refinement.
 
-    intercept : boolean, default=False
-        abd
-
-    max_iter : int, default=10000
-        abcd
     """
     
     def __init__(self, data, lag, null_imp=True, method='fixedb', bandwidth="SPJ", time_trend=False, diff=False, alpha=0.05):
