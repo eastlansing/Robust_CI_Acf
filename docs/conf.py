@@ -10,7 +10,7 @@ sys.path.insert(0, os.path.abspath('..'))
 # -- Project information -----------------------------------------------------
 
 project = 'Robust_CI_Acf'
-author = 'Your Name'
+author = 'Taeyoon Hwang'
 
 # The full version, including alpha/beta/rc tags
 release = '1.0.0'
