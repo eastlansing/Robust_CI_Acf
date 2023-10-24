@@ -89,6 +89,29 @@
 <dt class="sig sig-object py" id="robust.HAC_robust_conf_int">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">robust.</span></span><span class="sig-name descname"><span class="pre">HAC_robust_conf_int</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lag</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">null_imp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'fixedb'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bandwidth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'SPJ'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_trend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">diff</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.05</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/robust.html#HAC_robust_conf_int"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#robust.HAC_robust_conf_int" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>This class implements the IPCA algorithm by Kelly, Pruitt, Su (2017).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>n_factors</strong> (<em>int</em><em>, </em><em>default=1</em>) – The total number of factors to estimate. Note, the number of
+estimated factors is automatically reduced by the number of
+pre-specified factors. For example, if n_factors = 2 and one
+pre-specified factor is passed, then InstrumentedPCA will estimate
+one factor estimated in addition to the pre-specified factor.</p></li>
+<li><p><strong>intercept</strong> (<em>boolean</em><em>, </em><em>default=False</em>) – Determines whether the model is estimated with or without an intercept</p></li>
+<li><p><strong>max_iter</strong> (<em>int</em><em>, </em><em>default=10000</em>) – Maximum number of alternating least squares updates before the
+estimation is stopped</p></li>
+<li><p><strong>iter_tol</strong> (<em>float</em><em>, </em><em>default=10e-6</em>) – Tolerance threshold for stopping the alternating least squares
+procedure</p></li>
+<li><p><strong>alpha</strong> (<em>scalar</em>) – Regularizing constant for Gamma estimation.  If this is set to
+zero then the estimation defaults to non-regularized.</p></li>
+<li><p><strong>l1_ratio</strong> (<em>scalar</em>) – Ratio of l1 and l2 penalties for elastic net Gamma fit.</p></li>
+<li><p><strong>n_jobs</strong> (<em>scalar</em>) – number of jobs for F step estimation in ALS, if set to one no
+parallelization is done</p></li>
+<li><p><strong>backend</strong> (<em>str</em>) – label for Joblib backend used for F step in ALS</p></li>
+</ul>
+</dd>
+</dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="robust.HAC_robust_conf_int.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lag</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">null_imp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'fixedb'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bandwidth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'SPJ'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_trend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">diff</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.05</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/robust.html#HAC_robust_conf_int.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#robust.HAC_robust_conf_int.__init__" title="Permalink to this definition"></a></dt>

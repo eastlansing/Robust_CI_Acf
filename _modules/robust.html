@@ -67,6 +67,46 @@
              
   <h1>Source code for robust</h1><div class="highlight"><pre>
 <div class="viewcode-block" id="HAC_robust_conf_int"><a class="viewcode-back" href="../module_robust.html#robust.HAC_robust_conf_int">[docs]</a><span></span><span class="k">class</span> <span class="nc">HAC_robust_conf_int</span><span class="p">:</span>
+<span class="w">    </span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class implements the IPCA algorithm by Kelly, Pruitt, Su (2017).</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+
+<span class="sd">    n_factors : int, default=1</span>
+<span class="sd">        The total number of factors to estimate. Note, the number of</span>
+<span class="sd">        estimated factors is automatically reduced by the number of</span>
+<span class="sd">        pre-specified factors. For example, if n_factors = 2 and one</span>
+<span class="sd">        pre-specified factor is passed, then InstrumentedPCA will estimate</span>
+<span class="sd">        one factor estimated in addition to the pre-specified factor.</span>
+
+<span class="sd">    intercept : boolean, default=False</span>
+<span class="sd">        Determines whether the model is estimated with or without an intercept</span>
+
+<span class="sd">    max_iter : int, default=10000</span>
+<span class="sd">        Maximum number of alternating least squares updates before the</span>
+<span class="sd">        estimation is stopped</span>
+
+<span class="sd">    iter_tol : float, default=10e-6</span>
+<span class="sd">        Tolerance threshold for stopping the alternating least squares</span>
+<span class="sd">        procedure</span>
+
+<span class="sd">    alpha : scalar</span>
+<span class="sd">        Regularizing constant for Gamma estimation.  If this is set to</span>
+<span class="sd">        zero then the estimation defaults to non-regularized.</span>
+
+<span class="sd">    l1_ratio : scalar</span>
+<span class="sd">        Ratio of l1 and l2 penalties for elastic net Gamma fit.</span>
+
+<span class="sd">    n_jobs : scalar</span>
+<span class="sd">        number of jobs for F step estimation in ALS, if set to one no</span>
+<span class="sd">        parallelization is done</span>
+
+<span class="sd">    backend : str</span>
+<span class="sd">        label for Joblib backend used for F step in ALS</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
 <div class="viewcode-block" id="HAC_robust_conf_int.__init__"><a class="viewcode-back" href="../module_robust.html#robust.HAC_robust_conf_int.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">lag</span><span class="p">,</span> <span class="n">null_imp</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;fixedb&#39;</span><span class="p">,</span> <span class="n">bandwidth</span><span class="o">=</span><span class="s2">&quot;SPJ&quot;</span><span class="p">,</span> <span class="n">time_trend</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">diff</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.05</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">data</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">lag</span> <span class="o">=</span> <span class="n">lag</span>
