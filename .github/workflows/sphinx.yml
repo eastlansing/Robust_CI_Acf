@@ -24,7 +24,7 @@ jobs:
           pip install sphinxcontrib-napoleon  # For parsing NumPy-style docstrings
 
       - name: Build Documentation
-        run: make html
+        run: sphinx-build -b html docs docs/_build/html
         working-directory: docs
 
       - name: Deploy to GitHub Pages
