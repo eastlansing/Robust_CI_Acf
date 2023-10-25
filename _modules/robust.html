@@ -1,0 +1,957 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>robust &mdash; Robust_CI_Acf 1.0.0 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=af2ce170"></script>
+        <script src="../_static/doctools.js?v=888ff710"></script>
+        <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            Robust_CI_Acf
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Robust_CI_Acf</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">Module code</a></li>
+      <li class="breadcrumb-item active">robust</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for robust</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">scipy.stats</span> <span class="k">as</span> <span class="nn">stats</span>
+<span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">copy</span>
+<span class="kn">import</span> <span class="nn">cmath</span>
+
+<div class="viewcode-block" id="HAC_robust_conf_int"><a class="viewcode-back" href="../module_robust.html#robust.HAC_robust_conf_int">[docs]</a><span class="k">class</span> <span class="nc">HAC_robust_conf_int</span><span class="p">:</span>
+<span class="w">    </span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Implements the Heteroskedasticity and Autocorrelation Consistent (HAC) robust confidence intervals for autocorrelation analysis.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    data : array-like</span>
+<span class="sd">        The input data series for which the HAC robust confidence intervals are to be calculated.</span>
+<span class="sd">    </span>
+<span class="sd">    lag : int</span>
+<span class="sd">        The maximum lag to be considered for autocorrelation.</span>
+<span class="sd">    </span>
+<span class="sd">    null_imp : bool, default=True</span>
+<span class="sd">        Indicates if the null hypothesis of no importance should be considered.</span>
+<span class="sd">    </span>
+<span class="sd">    method : str, default=&#39;fixedb&#39;</span>
+<span class="sd">        The method used for estimation.</span>
+<span class="sd">    </span>
+<span class="sd">    bandwidth : str, default=&quot;SPJ&quot;</span>
+<span class="sd">        Specifies the bandwidth method used in the estimation.</span>
+<span class="sd">    </span>
+<span class="sd">    time_trend : bool, default=False</span>
+<span class="sd">        If True, a time trend is considered in the model.</span>
+<span class="sd">    </span>
+<span class="sd">    diff : bool, default=False</span>
+<span class="sd">        If True, calculates the difference series of the data.</span>
+<span class="sd">    </span>
+<span class="sd">    alpha : float, default=0.05</span>
+<span class="sd">        Significance level for the confidence interval.</span>
+
+<span class="sd">    Note</span>
+<span class="sd">    ----</span>
+<span class="sd">    Ensure that the provided parameters, especially &#39;method&#39; and &#39;bandwidth&#39;, align with the domain-specific options available. The provided options are for demonstration purposes and may need further refinement.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="HAC_robust_conf_int.__init__"><a class="viewcode-back" href="../module_robust.html#robust.HAC_robust_conf_int.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">lag</span><span class="p">,</span> <span class="n">null_imp</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;fixedb&#39;</span><span class="p">,</span> <span class="n">bandwidth</span><span class="o">=</span><span class="s2">&quot;SPJ&quot;</span><span class="p">,</span> <span class="n">time_trend</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">diff</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.05</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">data</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lag</span> <span class="o">=</span> <span class="n">lag</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">null_imp</span> <span class="o">=</span> <span class="n">null_imp</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">method</span> <span class="o">=</span> <span class="n">method</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bandwidth</span> <span class="o">=</span> <span class="n">bandwidth</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">time_trend</span> <span class="o">=</span> <span class="n">time_trend</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">diff</span> <span class="o">=</span> <span class="n">diff</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">alpha</span> <span class="o">=</span> <span class="n">alpha</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rho_est_values</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cv_values</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">var_unres_values</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_calculate_estimations</span><span class="p">()</span></div>
+
+    <span class="k">def</span> <span class="nf">_calculate_estimations</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">diff</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">k_values</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">lag</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>  <span class="c1"># 1 to lag k</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">rho_est_values</span> <span class="o">=</span> <span class="p">[]</span>
+        
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">null_imp</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">lower_values</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">upper_values</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">index_values</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cv_values</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">var_res_under_zero_values</span> <span class="o">=</span> <span class="p">[]</span>
+
+            <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">k_values</span><span class="p">:</span>
+                <span class="c1"># calculate rho_est, M_n_band</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">time_trend</span><span class="p">:</span>
+                    <span class="n">rho_est</span><span class="p">,</span> <span class="n">w_t</span><span class="p">,</span> <span class="n">res_y_t_k</span> <span class="o">=</span> <span class="n">regression_residuals</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="n">k</span><span class="p">)</span>
+                    <span class="n">vhat_opt3</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">res_y_t_k</span><span class="o">*</span><span class="n">w_t</span><span class="p">)</span>
+                    <span class="n">vhat_opt3</span> <span class="o">=</span> <span class="n">vhat_opt3</span> <span class="o">-</span> <span class="n">vhat_opt3</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">nmp</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">coeffs</span> <span class="o">=</span> <span class="n">reg_estimating_equation_v1</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">lag</span><span class="o">=</span><span class="n">k</span><span class="p">)</span>  <span class="c1"># assumed function name and arguments</span>
+                    <span class="n">uhat_opt3</span> <span class="o">=</span> <span class="n">y</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">coeffs</span><span class="p">)</span>  <span class="c1"># null is not imposed</span>
+                    <span class="n">vhat_opt3</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">X</span> <span class="o">*</span> <span class="n">uhat_opt3</span><span class="p">)</span>
+                    <span class="n">vhat_opt3</span> <span class="o">=</span> <span class="n">vhat_opt3</span> <span class="o">-</span> <span class="n">vhat_opt3</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+                    <span class="n">rho_est</span> <span class="o">=</span> <span class="n">coeffs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+                <span class="c1"># method and bandwidth processing</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;OS&quot;</span><span class="p">:</span>
+                    <span class="k">pass</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">bandwidth</span> <span class="o">==</span> <span class="s2">&quot;SPJ&quot;</span><span class="p">:</span>  <span class="c1"># assuming bandwidth is an attribute</span>
+                        <span class="n">spj_function</span> <span class="o">=</span> <span class="n">create_spj_function</span><span class="p">(</span><span class="n">w</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>  <span class="c1"># assumed function name and arguments</span>
+                        <span class="n">M_n_spj</span> <span class="o">=</span> <span class="n">spj_function</span><span class="p">(</span><span class="n">vhat_opt3</span><span class="p">)</span>
+                        <span class="n">M_n_band</span> <span class="o">=</span> <span class="n">M_n_spj</span>
+                    <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">bandwidth</span> <span class="o">==</span> <span class="s2">&quot;AD&quot;</span><span class="p">:</span>
+                        <span class="n">M_n_AD</span> <span class="o">=</span> <span class="n">AD_band</span><span class="p">(</span><span class="n">vhat_opt3</span><span class="p">)</span>  <span class="c1"># assumed function name and arguments</span>
+                        <span class="n">M_n_band</span> <span class="o">=</span> <span class="n">M_n_AD</span>  <span class="c1"># assumed variable name</span>
+
+                <span class="c1"># Calculate Q2</span>
+                <span class="n">Q_2</span> <span class="o">=</span> <span class="n">compute_Q2</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span>
+                <span class="n">Tnum1</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">)</span> <span class="o">-</span> <span class="n">k</span>
+
+                <span class="c1"># Calculate Omegas</span>
+                <span class="n">k_function_vectorized</span> <span class="o">=</span> <span class="n">parzen_k_function_vectorized</span>
+                <span class="n">omegas_res_dm</span> <span class="o">=</span> <span class="n">compute_omegas_vectorized_demean</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">M_n_band</span><span class="p">,</span> <span class="n">k_function_vectorized</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span>
+
+                <span class="c1"># fixed-b</span>
+                <span class="n">fixedb_coeffs</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.43754</span><span class="p">,</span> <span class="mf">0.11912</span><span class="p">,</span> <span class="mf">0.08640</span><span class="p">,</span> <span class="mf">0.49629</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.57879</span><span class="p">,</span> <span class="mf">0.43266</span><span class="p">,</span> <span class="mf">0.02543</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.02379</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.02376</span><span class="p">]</span>
+                <span class="n">fixed_cv_res</span> <span class="o">=</span> <span class="n">calc_fixed_cv_org_alpha</span><span class="p">(</span><span class="n">fixed_b</span><span class="o">=</span><span class="n">M_n_band</span><span class="p">,</span> <span class="n">Tnum</span><span class="o">=</span><span class="n">Tnum1</span><span class="p">,</span> <span class="n">fixedb_coeffs</span><span class="o">=</span><span class="n">fixedb_coeffs</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">alpha</span><span class="p">)</span>
+
+                <span class="c1"># Choose CV by condition</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;fixedb&quot;</span><span class="p">:</span>
+                    <span class="n">cv_real</span> <span class="o">=</span> <span class="n">fixed_cv_res</span>
+                <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;normal&quot;</span><span class="p">:</span>
+                    <span class="n">cv_real</span> <span class="o">=</span> <span class="n">stats</span><span class="o">.</span><span class="n">norm</span><span class="o">.</span><span class="n">ppf</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">alpha</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
+
+                <span class="c1"># calc roots</span>
+                <span class="n">c_coef_res_dm</span> <span class="o">=</span> <span class="n">compute_c_coefficients</span><span class="p">(</span><span class="n">omegas</span><span class="o">=</span><span class="n">omegas_res_dm</span><span class="p">,</span> <span class="n">cv</span><span class="o">=</span><span class="n">cv_real</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">k_val</span><span class="o">=</span><span class="n">k</span><span class="p">,</span> <span class="n">rho_k_til</span><span class="o">=</span><span class="n">rho_est</span><span class="p">,</span> <span class="n">Q_2</span><span class="o">=</span><span class="n">Q_2</span><span class="p">)</span>
+                <span class="n">roots_res_dm</span> <span class="o">=</span> <span class="n">quadratic_roots</span><span class="p">(</span><span class="n">c_coef_res_dm</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">c_coef_res_dm</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">c_coef_res_dm</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+
+                <span class="n">roots</span> <span class="o">=</span> <span class="n">roots_res_dm</span>
+                <span class="n">c_coef</span> <span class="o">=</span> <span class="n">c_coef_res_dm</span>
+
+                <span class="n">is_first_root_complex</span> <span class="o">=</span> <span class="n">roots</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">imag</span> <span class="o">!=</span> <span class="mi">0</span>
+                <span class="n">is_second_root_complex</span> <span class="o">=</span> <span class="n">roots</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">imag</span> <span class="o">!=</span> <span class="mi">0</span>
+
+                <span class="k">if</span> <span class="n">is_first_root_complex</span> <span class="ow">or</span> <span class="n">is_second_root_complex</span><span class="p">:</span>
+                    <span class="n">index</span> <span class="o">=</span> <span class="mi">2</span> <span class="k">if</span> <span class="n">c_coef</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="mi">3</span>
+                    <span class="k">if</span> <span class="n">index</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+                        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Open upward, vertex is above 0, where there is no such collection of null value rejecting null hypothesis. Impossible.&quot;</span><span class="p">)</span>
+                    <span class="n">upper</span> <span class="o">=</span> <span class="mi">1</span>
+                    <span class="n">lower</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">index</span> <span class="o">=</span> <span class="mi">0</span> <span class="k">if</span> <span class="n">c_coef</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="mi">1</span>
+                    <span class="n">lower</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">roots</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">real</span><span class="p">,</span> <span class="n">roots</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">real</span><span class="p">)</span>
+                    <span class="n">upper</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">roots</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">real</span><span class="p">,</span> <span class="n">roots</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">real</span><span class="p">)</span>
+                    
+                    <span class="c1">#Truncate if greater than 1</span>
+                    <span class="c1">#if np.float64(lower) &lt; -1:</span>
+                    <span class="c1">#    lower = -1</span>
+                    <span class="c1">#if np.float64(upper) &gt; 1:</span>
+                    <span class="c1">#    upper = 1</span>
+
+                <span class="c1"># Appending results for this k value to their respective lists</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">rho_est_values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="n">rho_est</span><span class="p">))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">lower_values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="n">lower</span><span class="p">))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">upper_values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="n">upper</span><span class="p">))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">index_values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
+                
+                <span class="n">var_res_under_zero11</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_calculate_var_res_under_zero</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">var_res_under_zero_values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="n">var_res_under_zero11</span><span class="p">))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">cv_values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="n">cv_real</span><span class="p">))</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cv_values</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">var_unres_values</span> <span class="o">=</span> <span class="p">[]</span>
+
+            <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">k_values</span><span class="p">:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">time_trend</span><span class="p">:</span>
+                    <span class="n">rho_est</span><span class="p">,</span> <span class="n">w_t</span><span class="p">,</span> <span class="n">res_y_t_k</span> <span class="o">=</span> <span class="n">regression_residuals</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="n">k</span><span class="p">)</span>
+                    <span class="n">vhat_opt1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">res_y_t_k</span> <span class="o">*</span> <span class="n">w_t</span><span class="p">)</span>
+                    <span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">res_y_t_k</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">nmp</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">coeffs</span> <span class="o">=</span> <span class="n">reg_estimating_equation_v1</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">lag</span><span class="o">=</span><span class="n">k</span><span class="p">)</span>  <span class="c1"># assumed function name and arguments</span>
+                    <span class="n">uhat_opt1</span> <span class="o">=</span> <span class="n">y</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">coeffs</span><span class="p">)</span>  <span class="c1"># null is not imposed</span>
+                    <span class="n">vhat_opt1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">X</span> <span class="o">*</span> <span class="n">uhat_opt1</span><span class="p">)</span>
+                    <span class="n">rho_est</span> <span class="o">=</span> <span class="n">coeffs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;OS&quot;</span><span class="p">:</span>
+                    <span class="k">pass</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">bandwidth</span> <span class="o">==</span> <span class="s2">&quot;SPJ&quot;</span><span class="p">:</span>  <span class="c1"># assuming bandwidth is an attribute</span>
+                        <span class="n">spj_function</span> <span class="o">=</span> <span class="n">create_spj_function</span><span class="p">(</span><span class="n">w</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>  <span class="c1"># assumed function name and arguments</span>
+                        <span class="n">M_n_spj</span> <span class="o">=</span> <span class="n">spj_function</span><span class="p">(</span><span class="n">vhat_opt1</span><span class="p">)</span>
+                        <span class="n">M_n_band</span> <span class="o">=</span> <span class="n">M_n_spj</span>
+                    <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">bandwidth</span> <span class="o">==</span> <span class="s2">&quot;AD&quot;</span><span class="p">:</span>
+                        <span class="n">M_n_AD</span> <span class="o">=</span> <span class="n">AD_band</span><span class="p">(</span><span class="n">vhat_opt1</span><span class="p">)</span>  <span class="c1"># assumed function name and arguments</span>
+                        <span class="n">M_n_band</span> <span class="o">=</span> <span class="n">M_n_AD</span>  <span class="c1"># assumed variable name</span>
+
+                    <span class="n">fixedb_coeffs</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.43754</span><span class="p">,</span> <span class="mf">0.11912</span><span class="p">,</span> <span class="mf">0.08640</span><span class="p">,</span> <span class="mf">0.49629</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.57879</span><span class="p">,</span> <span class="mf">0.43266</span><span class="p">,</span> <span class="mf">0.02543</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.02379</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.02376</span><span class="p">]</span>
+                    <span class="n">fixed_cv</span><span class="p">,</span> <span class="n">var_unres</span> <span class="o">=</span> <span class="n">process_var_fixedbcv_alpha</span><span class="p">(</span><span class="n">vhat</span><span class="o">=</span><span class="n">vhat_opt1</span><span class="p">,</span> <span class="n">M_n</span><span class="o">=</span><span class="n">M_n_band</span><span class="p">,</span> <span class="n">X</span><span class="o">=</span><span class="n">X</span><span class="p">,</span> <span class="n">nmp</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">X</span><span class="p">),</span> <span class="n">fixedb_coeffs</span><span class="o">=</span><span class="n">fixedb_coeffs</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">alpha</span><span class="p">)</span>  <span class="c1"># assumed function name and arguments</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">time_trend</span><span class="p">:</span>
+                        <span class="k">pass</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">var_unres</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">var_unres</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">])</span>
+                    
+                    
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;fixedb&quot;</span><span class="p">:</span>
+                        <span class="n">cv_real</span> <span class="o">=</span> <span class="n">fixed_cv</span>
+                    <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;normal&quot;</span><span class="p">:</span>
+                        <span class="n">cv_real</span> <span class="o">=</span> <span class="n">stats</span><span class="o">.</span><span class="n">norm</span><span class="o">.</span><span class="n">ppf</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">alpha</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
+
+                <span class="bp">self</span><span class="o">.</span><span class="n">rho_est_values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="n">rho_est</span><span class="p">))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">cv_values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="n">cv_real</span><span class="p">))</span>  <span class="c1"># updated cv to cv_real</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">var_unres_values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="n">var_unres</span><span class="p">))</span>
+                
+    
+    <span class="k">def</span> <span class="nf">_calculate_var_res_under_zero</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculates the variance estimator under null imposed for a given lag.</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters:</span>
+<span class="sd">        - k (int): The lag order for the regression estimating equation.</span>
+<span class="sd">        </span>
+<span class="sd">        Returns:</span>
+<span class="sd">        - var_res_under_zero11 (float): The element at index (1,1) of the variance estimates under null imposed.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        
+        <span class="n">y_z</span><span class="p">,</span> <span class="n">x_z</span><span class="p">,</span> <span class="n">nmp_z</span><span class="p">,</span> <span class="n">X_z</span><span class="p">,</span> <span class="n">coeffs_z</span> <span class="o">=</span> <span class="n">reg_estimating_equation_v1</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">lag</span><span class="o">=</span><span class="n">k</span><span class="p">)</span>
+        <span class="n">null_val</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">uhat_z</span> <span class="o">=</span> <span class="p">(</span><span class="n">y_z</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">y_z</span><span class="p">))</span> <span class="o">-</span> <span class="n">null_val</span><span class="o">*</span><span class="p">(</span><span class="n">x_z</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">x_z</span><span class="p">))</span>
+        <span class="n">vhat_z</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">X_z</span><span class="o">*</span><span class="n">uhat_z</span><span class="p">)</span>
+        <span class="n">vhat_z</span> <span class="o">=</span> <span class="n">vhat_z</span> <span class="o">-</span> <span class="n">vhat_z</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># Stock Watson demeaning</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">bandwidth</span> <span class="o">==</span> <span class="s2">&quot;SPJ&quot;</span><span class="p">:</span>
+            <span class="n">spj_function</span> <span class="o">=</span> <span class="n">create_spj_function</span><span class="p">(</span><span class="n">w</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+            <span class="n">M_n_z</span> <span class="o">=</span> <span class="n">spj_function</span><span class="p">(</span><span class="n">vhat_z</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">bandwidth</span> <span class="o">==</span> <span class="s2">&quot;AD&quot;</span><span class="p">:</span>
+            <span class="n">M_n_z</span> <span class="o">=</span> <span class="n">AD_band</span><span class="p">(</span><span class="n">vhat_z</span><span class="p">)</span>
+        
+        <span class="n">fixedb_coeffs</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.43754</span><span class="p">,</span> <span class="mf">0.11912</span><span class="p">,</span> <span class="mf">0.08640</span><span class="p">,</span> <span class="mf">0.49629</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.57879</span><span class="p">,</span> <span class="mf">0.43266</span><span class="p">,</span> <span class="mf">0.02543</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.02379</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.02376</span><span class="p">]</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">var_res_under_zero</span> <span class="o">=</span> <span class="n">process_var_fixedbcv_alpha</span><span class="p">(</span><span class="n">vhat_z</span><span class="p">,</span> <span class="n">M_n_z</span><span class="p">,</span> <span class="n">X_z</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">X_z</span><span class="p">),</span> <span class="n">fixedb_coeffs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">alpha</span><span class="p">)</span>
+        <span class="n">var_res_under_zero11</span> <span class="o">=</span> <span class="n">var_res_under_zero</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="n">var_res_under_zero11</span>
+
+<div class="viewcode-block" id="HAC_robust_conf_int.plot_acf"><a class="viewcode-back" href="../module_robust.html#robust.HAC_robust_conf_int.plot_acf">[docs]</a>    <span class="k">def</span> <span class="nf">plot_acf</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">CI_HAC</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">CB_HAC</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">CB_stata</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">CB_bart</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Autocorrelogram with HAC robust CI&quot;</span><span class="p">,</span> <span class="n">save_as_pdf</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="s2">&quot;autocorrelogram.pdf&quot;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">null_imp</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_plot_acf_null_imp</span><span class="p">(</span><span class="n">CI_HAC</span><span class="p">,</span> <span class="n">CB_HAC</span><span class="p">,</span> <span class="n">CB_stata</span><span class="p">,</span> <span class="n">CB_bart</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">save_as_pdf</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_plot_acf_null_not_imp</span><span class="p">(</span><span class="n">CI_HAC</span><span class="p">,</span> <span class="n">CB_HAC</span><span class="p">,</span> <span class="n">CB_stata</span><span class="p">,</span> <span class="n">CB_bart</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">save_as_pdf</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span></div>
+            
+    
+    <span class="k">def</span> <span class="nf">_stacked_autocorrelation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">):</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">time_trend</span><span class="p">:</span>
+            <span class="n">t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="n">residuals_data</span> <span class="o">=</span> <span class="n">partial_regression</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">data</span><span class="p">),</span> <span class="n">t</span><span class="p">,</span> <span class="n">coef</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">cons</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">residuals_data</span><span class="p">)</span>
+            
+            
+        <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>  <span class="c1"># Reshape the data to 1D if it&#39;s 2D    </span>
+        <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="n">mean_val</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="n">acf_values</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">for</span> <span class="n">lag</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">k</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>  <span class="c1"># Lag 0 to k</span>
+            <span class="n">numerator</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">((</span><span class="n">data</span><span class="p">[</span><span class="n">lag</span><span class="p">:]</span> <span class="o">-</span> <span class="n">mean_val</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">data</span><span class="p">[:</span><span class="o">-</span><span class="n">lag</span><span class="p">]</span> <span class="o">-</span> <span class="n">mean_val</span><span class="p">))</span>
+            <span class="n">denominator</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">((</span><span class="n">data</span> <span class="o">-</span> <span class="n">mean_val</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+            <span class="n">acf</span> <span class="o">=</span> <span class="n">numerator</span> <span class="o">/</span> <span class="n">denominator</span>
+            <span class="n">acf_values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">acf</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">acf_values</span>
+
+    <span class="k">def</span> <span class="nf">_calculate_var_stata</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">var_stata</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rho_est_values</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">k</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">var_stata</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="n">n</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">var_stata</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="mi">1</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="nb">sum</span><span class="p">([</span><span class="n">rho</span><span class="o">**</span><span class="mi">2</span> <span class="k">for</span> <span class="n">rho</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">rho_est_values</span><span class="p">[:</span><span class="n">k</span><span class="o">-</span><span class="mi">1</span><span class="p">]]))</span> <span class="o">/</span> <span class="n">n</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">var_stata</span>
+    
+    <span class="k">def</span> <span class="nf">_calculate_var_stata_ori</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">var_stata</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+        <span class="n">stacked_acf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stacked_autocorrelation</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rho_est_values</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rho_est_values</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">k</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">var_stata</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="n">n</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">var_stata</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="mi">1</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="nb">sum</span><span class="p">([</span><span class="n">rho</span><span class="o">**</span><span class="mi">2</span> <span class="k">for</span> <span class="n">rho</span> <span class="ow">in</span> <span class="n">stacked_acf</span><span class="p">[:</span><span class="n">k</span><span class="o">-</span><span class="mi">1</span><span class="p">]]))</span> <span class="o">/</span> <span class="n">n</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">var_stata</span>
+
+    <span class="k">def</span> <span class="nf">_plot_acf_null_imp</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">CI_HAC</span><span class="p">,</span> <span class="n">CB_HAC</span><span class="p">,</span> <span class="n">CB_stata</span><span class="p">,</span> <span class="n">CB_bart</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">save_as_pdf</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
+        <span class="n">lags</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rho_est_values</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+
+        <span class="n">ax</span><span class="o">.</span><span class="n">vlines</span><span class="p">(</span><span class="n">lags</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">rho_est_values</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="s1">&#39;blue&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">lags</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">rho_est_values</span><span class="p">,</span> <span class="s1">&#39;o&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;blue&#39;</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span> <span class="s1">&#39;Estimated Autocorrelation&#39;</span><span class="p">)</span>
+
+        <span class="n">ax</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+
+
+        <span class="k">if</span> <span class="n">CI_HAC</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">lower_values</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">upper_values</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">index_values</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">lag</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">lb</span><span class="p">,</span> <span class="n">ub</span><span class="p">,</span> <span class="n">index</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">lags</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">rho_est_values</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">lower_values</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">upper_values</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">index_values</span><span class="p">):</span>
+                <span class="n">lb</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">lb</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">),</span><span class="mi">1</span><span class="p">)</span>
+                <span class="n">ub</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="n">ub</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+                
+                <span class="n">bracket_length</span> <span class="o">=</span> <span class="mf">0.2</span>
+                <span class="k">if</span> <span class="n">index</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">index</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+                    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="n">lag</span><span class="p">,</span> <span class="n">lag</span><span class="p">],</span> <span class="p">[</span><span class="n">ub</span><span class="p">,</span> <span class="n">lb</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;gray&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mf">0.8</span><span class="p">)</span>
+                    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="n">lag</span><span class="o">-</span><span class="n">bracket_length</span><span class="p">,</span> <span class="n">lag</span><span class="o">+</span><span class="n">bracket_length</span><span class="p">],</span> <span class="p">[</span><span class="n">ub</span><span class="p">,</span> <span class="n">ub</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mf">1.1</span><span class="p">)</span>
+                    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="n">lag</span><span class="o">-</span><span class="n">bracket_length</span><span class="p">,</span> <span class="n">lag</span><span class="o">+</span><span class="n">bracket_length</span><span class="p">],</span> <span class="p">[</span><span class="n">lb</span><span class="p">,</span> <span class="n">lb</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mf">1.1</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Confidence Interval - HAC robust&#39;</span> <span class="k">if</span> <span class="n">lag</span> <span class="o">==</span> <span class="n">lags</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+
+                <span class="k">elif</span> <span class="n">index</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="n">lag</span><span class="p">,</span> <span class="n">lag</span><span class="p">],</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">lb</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;gray&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mf">0.8</span><span class="p">)</span>
+                    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="n">lag</span><span class="p">,</span> <span class="n">lag</span><span class="p">],</span> <span class="p">[</span><span class="n">ub</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;gray&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mf">0.8</span><span class="p">)</span>
+                    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="n">lag</span><span class="o">-</span><span class="n">bracket_length</span><span class="p">,</span> <span class="n">lag</span><span class="o">+</span><span class="n">bracket_length</span><span class="p">],</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mf">1.1</span><span class="p">)</span>
+                    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="n">lag</span><span class="o">-</span><span class="n">bracket_length</span><span class="p">,</span> <span class="n">lag</span><span class="o">+</span><span class="n">bracket_length</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mf">1.1</span><span class="p">)</span>
+                    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="n">lag</span><span class="o">-</span><span class="n">bracket_length</span><span class="p">,</span> <span class="n">lag</span><span class="o">+</span><span class="n">bracket_length</span><span class="p">],</span> <span class="p">[</span><span class="n">lb</span><span class="p">,</span> <span class="n">lb</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mf">1.1</span><span class="p">)</span>
+                    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="n">lag</span><span class="o">-</span><span class="n">bracket_length</span><span class="p">,</span> <span class="n">lag</span><span class="o">+</span><span class="n">bracket_length</span><span class="p">],</span> <span class="p">[</span><span class="n">ub</span><span class="p">,</span> <span class="n">ub</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mf">1.1</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Confidence Interval - HAC robust&#39;</span> <span class="k">if</span> <span class="n">lag</span> <span class="o">==</span> <span class="n">lags</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+
+                <span class="k">elif</span> <span class="n">index</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Open upward, vertex is above 0. No valid collection of null values rejecting the null hypothesis. Impossible.&quot;</span><span class="p">)</span>
+    
+        <span class="k">if</span> <span class="n">CB_HAC</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">cv_values</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">var_res_under_zero_values</span><span class="p">:</span>
+            <span class="n">upper_bounds</span> <span class="o">=</span> <span class="p">[</span><span class="nb">min</span><span class="p">(</span><span class="mf">1.00</span><span class="p">,</span> <span class="mi">0</span> <span class="o">+</span> <span class="n">fc</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">vu</span><span class="p">))</span> <span class="k">for</span> <span class="n">fc</span><span class="p">,</span> <span class="n">vu</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cv_values</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">var_res_under_zero_values</span><span class="p">)]</span>
+            <span class="n">lower_bounds</span> <span class="o">=</span> <span class="p">[</span><span class="nb">max</span><span class="p">(</span><span class="o">-</span><span class="mf">1.00</span><span class="p">,</span> <span class="mi">0</span> <span class="o">-</span> <span class="n">fc</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">vu</span><span class="p">))</span> <span class="k">for</span> <span class="n">fc</span><span class="p">,</span> <span class="n">vu</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cv_values</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">var_res_under_zero_values</span><span class="p">)]</span>
+
+            <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">lags</span><span class="p">,</span> <span class="n">upper_bounds</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;green&#39;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;dashed&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mf">0.99</span><span class="p">)</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">lags</span><span class="p">,</span> <span class="n">lower_bounds</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;green&#39;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;dashed&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mf">0.99</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Confidence Band - HAC robust&#39;</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="n">CB_stata</span><span class="p">:</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">lags</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stacked_autocorrelation</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rho_est_values</span><span class="p">)),</span> <span class="s1">&#39;o&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">,</span> <span class="n">markerfacecolor</span><span class="o">=</span><span class="s2">&quot;None&quot;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Sample Autocorrelation&#39;</span><span class="p">)</span>
+            
+            <span class="n">var_stata</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_calculate_var_stata_ori</span><span class="p">()</span>
+            <span class="n">upper_bound</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span> <span class="o">+</span> <span class="n">stats</span><span class="o">.</span><span class="n">norm</span><span class="o">.</span><span class="n">ppf</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">alpha</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">var</span><span class="p">)</span> <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">var_stata</span><span class="p">]</span>
+            <span class="n">lower_bound</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span> <span class="o">-</span> <span class="n">stats</span><span class="o">.</span><span class="n">norm</span><span class="o">.</span><span class="n">ppf</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">alpha</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">var</span><span class="p">)</span> <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">var_stata</span><span class="p">]</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">fill_between</span><span class="p">(</span><span class="n">lags</span><span class="p">,</span> <span class="n">lower_bound</span><span class="p">,</span> <span class="n">upper_bound</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;grey&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Confidence Band - Stata Formula&#39;</span><span class="p">)</span>
+            
+        <span class="k">if</span> <span class="n">CB_bart</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">CB_stata</span><span class="p">:</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">lags</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stacked_autocorrelation</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rho_est_values</span><span class="p">)),</span> <span class="s1">&#39;o&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">,</span> <span class="n">markerfacecolor</span><span class="o">=</span><span class="s2">&quot;None&quot;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Sample Autocorrelation&#39;</span><span class="p">)</span>
+            
+            <span class="n">conf_value</span> <span class="o">=</span> <span class="mf">1.96</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">))</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="n">conf_value</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;dashed&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mf">0.8</span><span class="p">)</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="o">-</span><span class="n">conf_value</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;dashed&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Confidence Band - Bartlett Formula&#39;</span><span class="p">)</span>
+        
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Lag&#39;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Estimated Autocorrelation&#39;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">title</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">loc</span><span class="o">=</span><span class="s1">&#39;upper right&#39;</span><span class="p">,</span> <span class="n">framealpha</span><span class="o">=</span><span class="mf">0.25</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rho_est_values</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">])</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">([</span><span class="o">-</span><span class="mf">1.1</span><span class="p">,</span> <span class="mf">1.1</span><span class="p">])</span>
+
+        <span class="k">if</span> <span class="n">save_as_pdf</span><span class="p">:</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s1">&#39;pdf&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_plot_acf_null_not_imp</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">CI_HAC</span><span class="p">,</span> <span class="n">CB_HAC</span><span class="p">,</span> <span class="n">CB_stata</span><span class="p">,</span> <span class="n">CB_bart</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">save_as_pdf</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
+        <span class="n">lags</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rho_est_values</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+
+        <span class="n">ax</span><span class="o">.</span><span class="n">vlines</span><span class="p">(</span><span class="n">lags</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">rho_est_values</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="s1">&#39;blue&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">lags</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">rho_est_values</span><span class="p">,</span> <span class="s1">&#39;o&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;blue&#39;</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span> <span class="s1">&#39;Estimated Autocorrelation&#39;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">CI_HAC</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">cv_values</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">var_unres_values</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">lag</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">fc</span><span class="p">,</span> <span class="n">vu</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">lags</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">rho_est_values</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cv_values</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">var_unres_values</span><span class="p">):</span>
+                <span class="n">upper_bound</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="mf">1.00</span><span class="p">,</span> <span class="n">v</span> <span class="o">+</span> <span class="n">fc</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">vu</span><span class="p">))</span>
+                <span class="n">lower_bound</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="o">-</span><span class="mf">1.00</span><span class="p">,</span> <span class="n">v</span> <span class="o">-</span> <span class="n">fc</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">vu</span><span class="p">))</span>
+                
+                
+                <span class="c1"># Plotting the brackets</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="n">lag</span><span class="p">,</span> <span class="n">lag</span><span class="p">],</span> <span class="p">[</span><span class="n">upper_bound</span><span class="p">,</span> <span class="n">v</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;gray&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mf">0.8</span><span class="p">)</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="n">lag</span><span class="p">,</span> <span class="n">lag</span><span class="p">],</span> <span class="p">[</span><span class="n">lower_bound</span><span class="p">,</span> <span class="n">v</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;gray&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mf">0.8</span><span class="p">)</span>
+                
+                <span class="c1"># Plotting the horizontal bar at the tip of brackets</span>
+                <span class="n">bracket_length</span> <span class="o">=</span> <span class="mf">0.2</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="n">lag</span><span class="o">-</span><span class="n">bracket_length</span><span class="p">,</span> <span class="n">lag</span><span class="o">+</span><span class="n">bracket_length</span><span class="p">],</span> <span class="p">[</span><span class="n">upper_bound</span><span class="p">,</span> <span class="n">upper_bound</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mf">1.1</span><span class="p">)</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="n">lag</span><span class="o">-</span><span class="n">bracket_length</span><span class="p">,</span> <span class="n">lag</span><span class="o">+</span><span class="n">bracket_length</span><span class="p">],</span> <span class="p">[</span><span class="n">lower_bound</span><span class="p">,</span> <span class="n">lower_bound</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mf">1.1</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Confidence Interval - HAC robust&#39;</span> <span class="k">if</span> <span class="n">lag</span> <span class="o">==</span> <span class="n">lags</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+                
+        <span class="c1">#if CB_HAC and self.cv_values and self.var_unres_values:</span>
+        <span class="c1">#    upper_bounds = [min(1.00, 0 + fc * np.sqrt(vu)) for fc, vu in zip(self.cv_values, self.var_unres_values)]</span>
+        <span class="c1">#    lower_bounds = [max(-1.00, 0 - fc * np.sqrt(vu)) for fc, vu in zip(self.cv_values, self.var_unres_values)]</span>
+            
+        <span class="c1">#    ax.fill_between(lags, lower_bounds, upper_bounds, color=&#39;gray&#39;, alpha=0.2)</span>
+        
+        <span class="k">if</span> <span class="n">CB_HAC</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">cv_values</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">var_unres_values</span><span class="p">:</span>
+            <span class="n">upper_bounds</span> <span class="o">=</span> <span class="p">[</span><span class="nb">min</span><span class="p">(</span><span class="mf">1.00</span><span class="p">,</span> <span class="mi">0</span> <span class="o">+</span> <span class="n">fc</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">vu</span><span class="p">))</span> <span class="k">for</span> <span class="n">fc</span><span class="p">,</span> <span class="n">vu</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cv_values</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">var_unres_values</span><span class="p">)]</span>
+            <span class="n">lower_bounds</span> <span class="o">=</span> <span class="p">[</span><span class="nb">max</span><span class="p">(</span><span class="o">-</span><span class="mf">1.00</span><span class="p">,</span> <span class="mi">0</span> <span class="o">-</span> <span class="n">fc</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">vu</span><span class="p">))</span> <span class="k">for</span> <span class="n">fc</span><span class="p">,</span> <span class="n">vu</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cv_values</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">var_unres_values</span><span class="p">)]</span>
+
+            <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">lags</span><span class="p">,</span> <span class="n">upper_bounds</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;green&#39;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;dashed&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mf">0.99</span><span class="p">)</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">lags</span><span class="p">,</span> <span class="n">lower_bounds</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;green&#39;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;dashed&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mf">0.99</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Confidence Band - HAC robust&#39;</span><span class="p">)</span>
+
+            
+        <span class="k">if</span> <span class="n">CB_stata</span><span class="p">:</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">lags</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stacked_autocorrelation</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rho_est_values</span><span class="p">)),</span> <span class="s1">&#39;o&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">,</span> <span class="n">markerfacecolor</span><span class="o">=</span><span class="s2">&quot;None&quot;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Sample Autocorrelation&#39;</span><span class="p">)</span>
+            
+            <span class="n">var_stata</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_calculate_var_stata_ori</span><span class="p">()</span>
+            <span class="n">upper_bound</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span> <span class="o">+</span> <span class="n">stats</span><span class="o">.</span><span class="n">norm</span><span class="o">.</span><span class="n">ppf</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">alpha</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">var</span><span class="p">)</span> <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">var_stata</span><span class="p">]</span>
+            <span class="n">lower_bound</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span> <span class="o">-</span> <span class="n">stats</span><span class="o">.</span><span class="n">norm</span><span class="o">.</span><span class="n">ppf</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">alpha</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">var</span><span class="p">)</span> <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">var_stata</span><span class="p">]</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">fill_between</span><span class="p">(</span><span class="n">lags</span><span class="p">,</span> <span class="n">lower_bound</span><span class="p">,</span> <span class="n">upper_bound</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;grey&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Confidence Band - Stata Formula&#39;</span><span class="p">)</span>
+            
+        <span class="k">if</span> <span class="n">CB_bart</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">CB_stata</span><span class="p">:</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">lags</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stacked_autocorrelation</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rho_est_values</span><span class="p">)),</span> <span class="s1">&#39;o&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">,</span> <span class="n">markerfacecolor</span><span class="o">=</span><span class="s2">&quot;None&quot;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Sample Autocorrelation&#39;</span><span class="p">)</span>
+            
+            <span class="n">conf_value</span> <span class="o">=</span> <span class="mf">1.96</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">))</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="n">conf_value</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;dashed&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mf">0.8</span><span class="p">)</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="o">-</span><span class="n">conf_value</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;dashed&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Confidence Band - Bartlett Formula&#39;</span><span class="p">)</span>
+
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Lag&#39;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Estimated Autocorrelation&#39;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">title</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">loc</span><span class="o">=</span><span class="s1">&#39;upper right&#39;</span><span class="p">,</span> <span class="n">framealpha</span><span class="o">=</span><span class="mf">0.25</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rho_est_values</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">])</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">([</span><span class="o">-</span><span class="mf">1.1</span><span class="p">,</span> <span class="mf">1.1</span><span class="p">])</span>
+
+        <span class="k">if</span> <span class="n">save_as_pdf</span><span class="p">:</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s1">&#39;pdf&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+            
+<div class="viewcode-block" id="HAC_robust_conf_int.get_estimated_acf"><a class="viewcode-back" href="../module_robust.html#robust.HAC_robust_conf_int.get_estimated_acf">[docs]</a>    <span class="k">def</span> <span class="nf">get_estimated_acf</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">rho_est_values</span></div>
+    
+    
+<div class="viewcode-block" id="HAC_robust_conf_int.get_confidence_interval"><a class="viewcode-back" href="../module_robust.html#robust.HAC_robust_conf_int.get_confidence_interval">[docs]</a>    <span class="k">def</span> <span class="nf">get_confidence_interval</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">null_imp</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">lower_values</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">upper_values</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">lower_bounds</span> <span class="o">=</span> <span class="p">[</span><span class="n">rho</span> <span class="o">-</span> <span class="n">cv</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">var</span><span class="p">)</span> <span class="k">for</span> <span class="n">rho</span><span class="p">,</span> <span class="n">cv</span><span class="p">,</span> <span class="n">var</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rho_est_values</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cv_values</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">var_unres_values</span><span class="p">)]</span>
+            <span class="n">upper_bounds</span> <span class="o">=</span> <span class="p">[</span><span class="n">rho</span> <span class="o">+</span> <span class="n">cv</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">var</span><span class="p">)</span> <span class="k">for</span> <span class="n">rho</span><span class="p">,</span> <span class="n">cv</span><span class="p">,</span> <span class="n">var</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rho_est_values</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cv_values</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">var_unres_values</span><span class="p">)]</span>
+            <span class="k">return</span> <span class="n">lower_bounds</span><span class="p">,</span> <span class="n">upper_bounds</span></div>
+        
+<div class="viewcode-block" id="HAC_robust_conf_int.get_confidence_band"><a class="viewcode-back" href="../module_robust.html#robust.HAC_robust_conf_int.get_confidence_band">[docs]</a>    <span class="k">def</span> <span class="nf">get_confidence_band</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">null_imp</span><span class="p">:</span>
+            <span class="n">lower_bounds</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span> <span class="o">-</span> <span class="n">cv</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">var</span><span class="p">)</span> <span class="k">for</span> <span class="n">cv</span><span class="p">,</span> <span class="n">var</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cv_values</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">var_res_under_zero_values</span><span class="p">)]</span>
+            <span class="n">upper_bounds</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span> <span class="o">+</span> <span class="n">cv</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">var</span><span class="p">)</span> <span class="k">for</span> <span class="n">cv</span><span class="p">,</span> <span class="n">var</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cv_values</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">var_res_under_zero_values</span><span class="p">)]</span>
+            <span class="k">return</span> <span class="n">lower_bounds</span><span class="p">,</span> <span class="n">upper_bounds</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">lower_bounds</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span> <span class="o">-</span> <span class="n">cv</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">var</span><span class="p">)</span> <span class="k">for</span> <span class="n">cv</span><span class="p">,</span> <span class="n">var</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cv_values</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">var_unres_values</span><span class="p">)]</span>
+            <span class="n">upper_bounds</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span> <span class="o">+</span> <span class="n">cv</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">var</span><span class="p">)</span> <span class="k">for</span> <span class="n">cv</span><span class="p">,</span> <span class="n">var</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cv_values</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">var_unres_values</span><span class="p">)]</span>
+            <span class="k">return</span> <span class="n">lower_bounds</span><span class="p">,</span> <span class="n">upper_bounds</span></div>
+        
+<div class="viewcode-block" id="HAC_robust_conf_int.get_null_imp_index"><a class="viewcode-back" href="../module_robust.html#robust.HAC_robust_conf_int.get_null_imp_index">[docs]</a>    <span class="k">def</span> <span class="nf">get_null_imp_index</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">null_imp</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">index_values</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span> <span class="p">(</span><span class="s2">&quot;Only null imposed has index&quot;</span><span class="p">)</span></div>
+    
+<div class="viewcode-block" id="HAC_robust_conf_int.get_cb_stata"><a class="viewcode-back" href="../module_robust.html#robust.HAC_robust_conf_int.get_cb_stata">[docs]</a>    <span class="k">def</span> <span class="nf">get_cb_stata</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">var_stata</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_calculate_var_stata_ori</span><span class="p">()</span>
+        <span class="n">upper_bounds</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span> <span class="o">+</span> <span class="n">stats</span><span class="o">.</span><span class="n">norm</span><span class="o">.</span><span class="n">ppf</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">alpha</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">var</span><span class="p">)</span> <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">var_stata</span><span class="p">]</span>
+        <span class="n">lower_bounds</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span> <span class="o">-</span> <span class="n">stats</span><span class="o">.</span><span class="n">norm</span><span class="o">.</span><span class="n">ppf</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">alpha</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">var</span><span class="p">)</span> <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">var_stata</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">lower_bounds</span><span class="p">,</span> <span class="n">upper_bounds</span></div>
+    
+<div class="viewcode-block" id="HAC_robust_conf_int.get_cv"><a class="viewcode-back" href="../module_robust.html#robust.HAC_robust_conf_int.get_cv">[docs]</a>    <span class="k">def</span> <span class="nf">get_cv</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">cv_values</span></div>
+    
+<div class="viewcode-block" id="HAC_robust_conf_int.get_sample_autocorrelation"><a class="viewcode-back" href="../module_robust.html#robust.HAC_robust_conf_int.get_sample_autocorrelation">[docs]</a>    <span class="k">def</span> <span class="nf">get_sample_autocorrelation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stacked_autocorrelation</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rho_est_values</span><span class="p">))</span></div></div>
+
+<span class="k">def</span> <span class="nf">calc_fixed_cv_org_alpha</span><span class="p">(</span><span class="n">fixed_b</span><span class="p">,</span> <span class="n">Tnum</span><span class="p">,</span> <span class="n">fixedb_coeffs</span><span class="p">,</span> <span class="n">alpha</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute fixed-b critical values for t-test</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">    - fixed_b: value of bandwidth (i.e. M)</span>
+<span class="sd">    - Tnum (int): length of time series, in this autocorrelation testing case, T-k</span>
+<span class="sd">    - fixedb_coeffs: List of fixed-b cv coefficients [c1, c2, ..., c9]</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">    - Scalar, fixed-b critical value</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="n">copy</span><span class="p">(</span><span class="n">fixedb_coeffs</span><span class="p">)</span>  <span class="c1"># shallow copy for list prevent mistake</span>
+    <span class="n">n_cv</span> <span class="o">=</span> <span class="n">stats</span><span class="o">.</span><span class="n">norm</span><span class="o">.</span><span class="n">ppf</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">alpha</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>  <span class="c1"># eg) stats.norm.ppf(0.975)</span>
+
+    <span class="k">return</span> <span class="n">n_cv</span> <span class="o">+</span> <span class="n">c</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">fixed_b</span> <span class="o">/</span> <span class="n">Tnum</span> <span class="o">*</span> <span class="n">n_cv</span><span class="p">)</span> <span class="o">+</span> <span class="n">c</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="p">((</span><span class="n">fixed_b</span> <span class="o">/</span> <span class="n">Tnum</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">n_cv</span> <span class="o">**</span> <span class="mi">2</span><span class="p">))</span> <span class="o">+</span> \
+           <span class="n">c</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">*</span> <span class="p">((</span><span class="n">fixed_b</span> <span class="o">/</span> <span class="n">Tnum</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">n_cv</span> <span class="o">**</span> <span class="mi">3</span><span class="p">))</span> <span class="o">+</span> \
+           <span class="n">c</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">*</span> <span class="p">(((</span><span class="n">fixed_b</span> <span class="o">/</span> <span class="n">Tnum</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">n_cv</span><span class="p">)</span> <span class="o">+</span> <span class="n">c</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span> <span class="o">*</span> <span class="p">(((</span><span class="n">fixed_b</span> <span class="o">/</span> <span class="n">Tnum</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">n_cv</span> <span class="o">**</span> <span class="mi">2</span><span class="p">))</span> <span class="o">+</span> \
+           <span class="n">c</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span> <span class="o">*</span> <span class="p">(((</span><span class="n">fixed_b</span> <span class="o">/</span> <span class="n">Tnum</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">n_cv</span> <span class="o">**</span> <span class="mi">3</span><span class="p">))</span> <span class="o">+</span> \
+           <span class="n">c</span><span class="p">[</span><span class="mi">6</span><span class="p">]</span> <span class="o">*</span> <span class="p">(((</span><span class="n">fixed_b</span> <span class="o">/</span> <span class="n">Tnum</span><span class="p">)</span> <span class="o">**</span> <span class="mi">3</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">n_cv</span> <span class="o">**</span> <span class="mi">1</span><span class="p">))</span> <span class="o">+</span> <span class="n">c</span><span class="p">[</span><span class="mi">7</span><span class="p">]</span> <span class="o">*</span> <span class="p">(((</span><span class="n">fixed_b</span> <span class="o">/</span> <span class="n">Tnum</span><span class="p">)</span> <span class="o">**</span> <span class="mi">3</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">n_cv</span> <span class="o">**</span> <span class="mi">2</span><span class="p">))</span> <span class="o">+</span> \
+           <span class="n">c</span><span class="p">[</span><span class="mi">8</span><span class="p">]</span> <span class="o">*</span> <span class="p">(((</span><span class="n">fixed_b</span> <span class="o">/</span> <span class="n">Tnum</span><span class="p">)</span> <span class="o">**</span> <span class="mi">3</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">n_cv</span> <span class="o">**</span> <span class="mi">3</span><span class="p">))</span>
+
+<span class="k">def</span> <span class="nf">process_var_fixedbcv_alpha</span><span class="p">(</span><span class="n">vhat</span><span class="p">,</span> <span class="n">M_n</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">nmp</span><span class="p">,</span> <span class="n">fixedb_coeffs</span><span class="p">,</span><span class="n">alpha</span><span class="p">):</span>
+    <span class="n">vhat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">vhat</span><span class="p">)</span>
+    <span class="n">X</span> <span class="o">=</span>  <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+    <span class="n">fixedb_coeffs</span> <span class="o">=</span> <span class="n">copy</span><span class="p">(</span><span class="n">fixedb_coeffs</span><span class="p">)</span>
+    
+    <span class="n">Q_inv</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">inv</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">X</span><span class="p">))</span>
+    <span class="n">LRV</span> <span class="o">=</span> <span class="n">newLRV_vec</span><span class="p">(</span><span class="n">vhat</span><span class="p">,</span> <span class="n">M_n</span><span class="p">)</span>
+    
+    <span class="n">var</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">multi_dot</span><span class="p">([</span><span class="n">Q_inv</span><span class="p">,</span> <span class="n">LRV</span><span class="p">,</span> <span class="n">Q_inv</span><span class="p">])</span> <span class="o">*</span> <span class="n">nmp</span>
+    <span class="n">fixed_cv</span> <span class="o">=</span> <span class="n">calc_fixed_cv_org_alpha</span><span class="p">(</span><span class="n">M_n</span><span class="p">,</span> <span class="n">nmp</span><span class="p">,</span> <span class="n">fixedb_coeffs</span><span class="p">,</span><span class="n">alpha</span><span class="p">)</span>
+    <span class="c1">#t_stat = (coeffs1 - true_acf1) / np.sqrt(np.float64(var[1, 1]))</span>
+
+    <span class="k">return</span> <span class="n">fixed_cv</span><span class="p">,</span> <span class="n">var</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="k">def</span> <span class="nf">regression_residuals</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">k</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute the beta_2 coefficient and residuals w_t after regressing </span>
+<span class="sd">    the residuals from partialling out the effects of t and intercept</span>
+<span class="sd">    on y_t and y_t-k.</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters:</span>
+<span class="sd">    - data: ndarray</span>
+<span class="sd">        Column vector containing the data series</span>
+<span class="sd">    - k: int</span>
+<span class="sd">        Lag value</span>
+<span class="sd">    </span>
+<span class="sd">    Returns:</span>
+<span class="sd">    - beta_2: float</span>
+<span class="sd">        Coefficient from regressing the residuals of y_t on y_t-k</span>
+<span class="sd">    - w_t: ndarray</span>
+<span class="sd">        Residuals from the regression</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+    <span class="n">T_data</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+    
+    <span class="n">y_t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">k</span><span class="p">:</span><span class="n">T_data</span><span class="p">,</span> <span class="p">:])</span>
+    <span class="n">y_t_minus_k</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">T_data</span> <span class="o">-</span> <span class="n">k</span><span class="p">,</span> <span class="p">:])</span>
+    <span class="n">t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">k</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">T_data</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    
+    <span class="c1"># Part 2: Partial out the effect of t and intercept on y_t and y_t-k</span>
+    <span class="n">residuals_y_t</span> <span class="o">=</span> <span class="n">partial_regression</span><span class="p">(</span><span class="n">y_t</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">coef</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">cons</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">residuals_y_t_minus_k</span> <span class="o">=</span> <span class="n">partial_regression</span><span class="p">(</span><span class="n">y_t_minus_k</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">coef</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">cons</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="c1"># Part 3: Regress the residuals on each other without intercept</span>
+    <span class="n">beta_2</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">partial_regression</span><span class="p">(</span><span class="n">residuals_y_t</span><span class="p">,</span> <span class="n">residuals_y_t_minus_k</span><span class="p">,</span> <span class="n">coef</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">cons</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    
+    <span class="c1"># w_t residuals from this regression</span>
+    <span class="n">w_t</span> <span class="o">=</span> <span class="n">residuals_y_t</span> <span class="o">-</span> <span class="n">beta_2</span> <span class="o">*</span> <span class="n">residuals_y_t_minus_k</span>
+
+    <span class="k">return</span> <span class="n">beta_2</span><span class="p">,</span> <span class="n">w_t</span><span class="p">,</span> <span class="n">residuals_y_t_minus_k</span>
+
+<span class="k">def</span> <span class="nf">partial_regression</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">coef</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">cons</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Perform a regression of y on x and optionally return the coefficients.</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters:</span>
+<span class="sd">    - y: ndarray</span>
+<span class="sd">        Dependent variable</span>
+<span class="sd">    - x: ndarray</span>
+<span class="sd">        Independent variable</span>
+<span class="sd">    - coef: bool (default: False)</span>
+<span class="sd">        If True, return coefficients</span>
+<span class="sd">    - cons: bool (default: True)</span>
+<span class="sd">        If True, include intercept in regression</span>
+<span class="sd">    </span>
+<span class="sd">    Returns:</span>
+<span class="sd">    - residuals: ndarray</span>
+<span class="sd">        Residuals from the regression</span>
+<span class="sd">    - gamma_1: float (optional)</span>
+<span class="sd">        Coefficient from the regression (if coef=True)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    
+    <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">y</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    
+    <span class="k">if</span> <span class="n">cons</span><span class="p">:</span>
+        <span class="n">cons_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">((</span><span class="n">cons_array</span><span class="p">,</span> <span class="n">x</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">X</span> <span class="o">=</span> <span class="n">x</span>
+
+    <span class="n">coeffs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">inv</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">transpose</span><span class="p">()</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">X</span><span class="p">))</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">transpose</span><span class="p">())</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+    <span class="n">y_pred</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">coeffs</span><span class="p">)</span>
+    <span class="n">residuals</span> <span class="o">=</span> <span class="n">y</span> <span class="o">-</span> <span class="n">y_pred</span>
+
+    <span class="k">if</span> <span class="n">coef</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">coeffs</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span> <span class="n">residuals</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">residuals</span>
+    
+<span class="k">def</span> <span class="nf">AD_band</span><span class="p">(</span><span class="n">vhat</span><span class="p">):</span>
+    <span class="n">vhat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">vhat</span><span class="p">)</span>
+    <span class="c1">#vhat = np.copy(xuhat)</span>
+    <span class="k">if</span> <span class="n">vhat</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">pass</span>
+    <span class="k">elif</span> <span class="n">vhat</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="n">vhat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">vhat</span><span class="p">[:,</span><span class="mi">1</span><span class="p">],(</span><span class="nb">len</span><span class="p">(</span><span class="n">vhat</span><span class="p">[:,</span><span class="mi">1</span><span class="p">]),</span><span class="mi">1</span><span class="p">)))</span> 
+    
+    <span class="n">T</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">vhat</span><span class="p">)</span>
+
+    <span class="n">vhat_t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">vhat</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
+    <span class="n">vhat_tm1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">vhat</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">y2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">vhat_t</span><span class="p">)</span>
+    <span class="n">X2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">vhat_tm1</span><span class="p">)</span>
+    <span class="n">rho_hat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">inv</span><span class="p">(</span><span class="n">X2</span><span class="o">.</span><span class="n">transpose</span><span class="p">()</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">X2</span><span class="p">))</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">X2</span><span class="o">.</span><span class="n">transpose</span><span class="p">())</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">y2</span><span class="p">)</span> <span class="c1">#without constant</span>
+    <span class="c1">#print (rho_hat)</span>
+    <span class="c1">#if (np.abs(rho_hat-1) &lt; 0.001) &amp; (rho_hat&gt;=1):</span>
+    <span class="c1">#    rho_hat = 1.001</span>
+    <span class="c1">#elif (np.abs(rho_hat-1) &lt; 0.001) &amp; (rho_hat&lt;1):</span>
+    <span class="c1">#    rho_hat = 0.999</span>
+        
+    <span class="c1">#if np.abs(rho_hat) &gt;= 0.97:</span>
+    <span class="c1">#    rho_hat = 0.97*np.sign(rho_hat)</span>
+
+    <span class="n">alpha_hat_2</span> <span class="o">=</span> <span class="p">(</span><span class="mi">4</span><span class="o">*</span><span class="p">(</span><span class="n">rho_hat</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">/</span><span class="p">((</span><span class="mi">1</span><span class="o">-</span><span class="n">rho_hat</span><span class="p">)</span><span class="o">**</span><span class="mi">4</span><span class="p">)</span> <span class="c1">#univariate version CLP</span>
+    <span class="n">ST</span> <span class="o">=</span> <span class="mf">2.6614</span><span class="o">*</span><span class="p">(</span><span class="n">T</span><span class="o">*</span><span class="n">alpha_hat_2</span><span class="p">)</span><span class="o">**</span><span class="p">(</span><span class="mf">0.2</span><span class="p">)</span> <span class="c1">#bandwidth</span>
+    <span class="n">ST</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="n">ST</span><span class="p">)</span>
+    
+    <span class="k">if</span> <span class="n">ST</span> <span class="o">&gt;</span> <span class="n">T</span><span class="p">:</span>
+        <span class="n">ST</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">T</span><span class="p">)</span>
+    
+    <span class="k">return</span> <span class="n">ST</span>
+
+<span class="k">def</span> <span class="nf">noncen_chisq</span><span class="p">(</span><span class="n">k</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">x</span><span class="p">):</span>
+    <span class="c1">#k is df</span>
+    <span class="c1">#j is non-centrality parameter</span>
+    <span class="n">pdf_v</span> <span class="o">=</span> <span class="mf">0.5</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="mf">0.5</span><span class="o">*</span><span class="p">(</span><span class="n">x</span><span class="o">+</span><span class="n">j</span><span class="p">))</span><span class="o">*</span><span class="p">((</span><span class="n">x</span><span class="o">/</span><span class="n">j</span><span class="p">)</span><span class="o">**</span><span class="p">(</span><span class="n">k</span><span class="o">/</span><span class="mi">4</span><span class="o">-</span><span class="mf">0.5</span><span class="p">))</span><span class="o">*</span><span class="n">mpmath</span><span class="o">.</span><span class="n">besseli</span><span class="p">(</span><span class="mf">0.5</span><span class="o">*</span><span class="n">k</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">j</span><span class="o">*</span><span class="n">x</span><span class="p">),</span> <span class="n">derivative</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">pdf_v2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="n">pdf_v</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">pdf_v2</span>
+
+<span class="k">def</span> <span class="nf">chisq_dfone</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="n">pdf_v</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">x</span><span class="o">/</span><span class="mi">2</span><span class="p">))</span><span class="o">/</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">math</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="n">x</span><span class="p">))</span>
+    <span class="n">pdf_v2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="n">pdf_v</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">pdf_v2</span>
+
+<span class="k">def</span> <span class="nf">SPJ_band</span><span class="p">(</span><span class="n">vhat</span><span class="p">,</span><span class="n">w</span><span class="p">,</span><span class="n">z_a</span><span class="o">=</span><span class="mf">1.96</span><span class="p">,</span><span class="n">delta</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span><span class="n">q</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span><span class="n">g</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span><span class="n">c</span><span class="o">=</span><span class="mf">0.539</span><span class="p">):</span>
+    <span class="c1">#for Parzen</span>
+    <span class="c1">#z_a = 1.96 # w is tuning parameter</span>
+    <span class="n">vhat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">vhat</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">vhat</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">pass</span>
+    <span class="k">elif</span> <span class="n">vhat</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="n">vhat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">vhat</span><span class="p">[:,</span><span class="mi">1</span><span class="p">],(</span><span class="nb">len</span><span class="p">(</span><span class="n">vhat</span><span class="p">[:,</span><span class="mi">1</span><span class="p">]),</span><span class="mi">1</span><span class="p">)))</span> 
+    
+    <span class="n">T</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">vhat</span><span class="p">)</span>
+
+    <span class="n">vhat_t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">vhat</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
+    <span class="n">vhat_tm1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">vhat</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">y2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">vhat_t</span><span class="p">)</span>
+    <span class="n">X2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">vhat_tm1</span><span class="p">)</span>
+    <span class="n">rho_hat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">inv</span><span class="p">(</span><span class="n">X2</span><span class="o">.</span><span class="n">transpose</span><span class="p">()</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">X2</span><span class="p">))</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">X2</span><span class="o">.</span><span class="n">transpose</span><span class="p">())</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">y2</span><span class="p">)</span> <span class="c1">#without constant</span>
+    
+    <span class="c1">#if np.abs(rho_hat) &gt;= 0.97:</span>
+    <span class="c1">#    rho_hat = 0.97*np.sign(rho_hat)</span>
+    
+    <span class="n">d_hat</span> <span class="o">=</span> <span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">rho_hat</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">rho_hat</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span>
+    <span class="n">d_hat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="n">d_hat</span><span class="p">)</span>
+    <span class="n">x_val</span> <span class="o">=</span> <span class="n">z_a</span><span class="o">**</span><span class="mi">2</span>
+    
+    <span class="c1">### calculation of b_hat</span>
+    <span class="n">G_0</span> <span class="o">=</span> <span class="n">chisq_dfone</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">x_val</span><span class="p">)</span>
+    <span class="n">G_d</span> <span class="o">=</span> <span class="n">noncen_chisq</span><span class="p">(</span><span class="n">k</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">j</span><span class="o">=</span><span class="n">delta</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span><span class="n">x</span><span class="o">=</span><span class="n">x_val</span><span class="p">)</span>
+    <span class="n">k_d</span> <span class="o">=</span> <span class="p">((</span><span class="n">delta</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">x_val</span><span class="p">))</span><span class="o">*</span><span class="n">noncen_chisq</span><span class="p">(</span><span class="n">k</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span><span class="n">j</span><span class="o">=</span><span class="n">delta</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span><span class="n">x</span><span class="o">=</span><span class="n">x_val</span><span class="p">)</span>
+    
+    <span class="k">if</span> <span class="n">d_hat</span><span class="o">*</span><span class="p">(</span><span class="n">w</span><span class="o">*</span><span class="n">G_0</span> <span class="o">-</span> <span class="n">G_d</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">b_hat</span> <span class="o">=</span> <span class="p">(((</span><span class="n">q</span><span class="o">*</span><span class="n">g</span><span class="o">*</span><span class="n">d_hat</span><span class="o">*</span><span class="p">(</span><span class="n">w</span><span class="o">*</span><span class="n">G_0</span> <span class="o">-</span> <span class="n">G_d</span><span class="p">))</span><span class="o">/</span><span class="p">(</span><span class="n">c</span><span class="o">*</span><span class="n">x_val</span><span class="o">*</span><span class="n">k_d</span><span class="p">))</span><span class="o">**</span><span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="mi">3</span><span class="p">))</span><span class="o">*</span><span class="p">(</span><span class="n">T</span><span class="o">**</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="o">/</span><span class="mi">3</span><span class="p">))</span>
+        <span class="c1">#print (b_hat)</span>
+    <span class="k">elif</span> <span class="n">d_hat</span><span class="o">*</span><span class="p">(</span><span class="n">w</span><span class="o">*</span><span class="n">G_0</span> <span class="o">-</span> <span class="n">G_d</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">b_hat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">T</span><span class="p">)</span><span class="o">/</span><span class="n">T</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Error&quot;</span><span class="p">)</span>
+    <span class="n">spj_band</span> <span class="o">=</span> <span class="n">b_hat</span> <span class="o">*</span> <span class="n">T</span>
+    <span class="n">spj_band</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="n">spj_band</span><span class="p">)</span>
+    
+    <span class="k">if</span> <span class="n">spj_band</span> <span class="o">&gt;</span> <span class="n">T</span><span class="p">:</span>
+        <span class="n">spj_band</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">T</span><span class="p">)</span>    
+    
+    <span class="k">return</span> <span class="n">spj_band</span>
+
+<span class="k">def</span> <span class="nf">create_spj_function</span><span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="n">z_a</span><span class="o">=</span><span class="mf">1.96</span><span class="p">,</span> <span class="n">delta</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">q</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">g</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="mf">0.539</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">spj_function</span><span class="p">(</span><span class="n">vhat</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">SPJ_band</span><span class="p">(</span><span class="n">vhat</span><span class="p">,</span> <span class="n">w</span><span class="o">=</span><span class="n">w</span><span class="p">,</span> <span class="n">z_a</span><span class="o">=</span><span class="n">z_a</span><span class="p">,</span> <span class="n">delta</span><span class="o">=</span><span class="n">delta</span><span class="p">,</span> <span class="n">q</span><span class="o">=</span><span class="n">q</span><span class="p">,</span> <span class="n">g</span><span class="o">=</span><span class="n">g</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="n">c</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">spj_function</span>
+
+<span class="k">def</span> <span class="nf">compute_Q2</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">k</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute Q2 value.</span>
+<span class="sd">    </span>
+<span class="sd">    Args:</span>
+<span class="sd">    - y (np.array): Input data array (time-series)</span>
+<span class="sd">    - k (int): lag k; i.e. rho_k</span>
+<span class="sd">    </span>
+<span class="sd">    Returns:</span>
+<span class="sd">    - float: Q2 value</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="n">T</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+
+    <span class="c1"># Compute the means</span>
+    <span class="n">ybar_1_T_minus_k</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">y</span><span class="p">[:</span><span class="n">T</span><span class="o">-</span><span class="n">k</span><span class="p">])</span>
+
+    <span class="c1"># Demeaning y values</span>
+    <span class="n">y_tilda_minus_k</span> <span class="o">=</span> <span class="n">y</span><span class="p">[:</span><span class="n">T</span><span class="o">-</span><span class="n">k</span><span class="p">]</span> <span class="o">-</span> <span class="n">ybar_1_T_minus_k</span>
+
+    <span class="c1"># Compute Q2</span>
+    <span class="n">Q2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">y_tilda_minus_k</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+    
+    <span class="k">return</span> <span class="n">Q2</span>
+
+<span class="k">def</span> <span class="nf">parzen_k_function_vectorized</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Vectorized Kernel Function.&quot;&quot;&quot;</span>
+    <span class="n">conditions</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mf">0.5</span><span class="p">),</span>
+        <span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mf">0.5</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="p">]</span>
+    
+    <span class="n">outputs</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="mi">1</span> <span class="o">-</span> <span class="mi">6</span> <span class="o">*</span> <span class="n">x</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="mi">6</span> <span class="o">*</span> <span class="nb">abs</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">**</span><span class="mi">3</span><span class="p">,</span>
+        <span class="mi">2</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="nb">abs</span><span class="p">(</span><span class="n">x</span><span class="p">))</span><span class="o">**</span><span class="mi">3</span>
+    <span class="p">]</span>
+    
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">conditions</span><span class="p">,</span> <span class="n">outputs</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">compute_omegas_vectorized_demean</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">k_function</span><span class="p">,</span> <span class="n">k</span><span class="p">):</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">T</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="c1"># Compute the means</span>
+    <span class="n">ybar_1_T_minus_k</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">y</span><span class="p">[:</span><span class="n">T</span><span class="o">-</span><span class="n">k</span><span class="p">])</span>
+    <span class="n">ybar_k_plus_1_T</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">y</span><span class="p">[</span><span class="n">k</span><span class="p">:</span><span class="n">T</span><span class="p">])</span>
+
+    <span class="c1"># Demeaning y values and computing v1 and v2</span>
+    <span class="n">y_tilda</span> <span class="o">=</span> <span class="n">y</span><span class="p">[</span><span class="n">k</span><span class="p">:]</span> <span class="o">-</span> <span class="n">ybar_k_plus_1_T</span>
+    <span class="n">y_tilda_minus_k</span> <span class="o">=</span> <span class="n">y</span><span class="p">[:</span><span class="n">T</span><span class="o">-</span><span class="n">k</span><span class="p">]</span> <span class="o">-</span> <span class="n">ybar_1_T_minus_k</span>
+
+    <span class="n">v1</span> <span class="o">=</span> <span class="p">(</span><span class="n">y_tilda</span> <span class="o">*</span> <span class="n">y_tilda_minus_k</span><span class="p">)</span><span class="o">.</span><span class="n">squeeze</span><span class="p">()</span>
+    <span class="n">v2</span> <span class="o">=</span> <span class="p">(</span><span class="n">y_tilda_minus_k</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">squeeze</span><span class="p">()</span>
+
+    <span class="c1"># Calculate the means of v1 and v2 </span>
+    <span class="n">mean_v1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">v1</span><span class="p">)</span>
+    <span class="n">mean_v2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">v2</span><span class="p">)</span>
+
+    <span class="c1"># Demean v1 and v2</span>
+    <span class="n">v1_demeaned</span> <span class="o">=</span> <span class="n">v1</span> <span class="o">-</span> <span class="n">mean_v1</span>
+    <span class="n">v2_demeaned</span> <span class="o">=</span> <span class="n">v2</span> <span class="o">-</span> <span class="n">mean_v2</span>
+
+    <span class="c1"># Create the kernel matrix</span>
+    <span class="n">indices_matrix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">k</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">T</span><span class="o">+</span><span class="mi">1</span><span class="p">)[:,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">k</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">T</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span>
+    <span class="n">K</span> <span class="o">=</span> <span class="n">k_function</span><span class="p">(</span><span class="n">indices_matrix</span> <span class="o">/</span> <span class="n">M</span><span class="p">)</span>
+
+    <span class="c1"># Compute Omega values using demeaned v1 and v2</span>
+    <span class="n">omega_11</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">v1_demeaned</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="n">K</span> <span class="o">*</span> <span class="n">v1_demeaned</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="p">:])</span> <span class="o">/</span> <span class="p">(</span><span class="n">T</span><span class="o">-</span><span class="n">k</span><span class="p">)</span>
+    <span class="n">omega_12</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">v1_demeaned</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="n">K</span> <span class="o">*</span> <span class="n">v2_demeaned</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="p">:])</span> <span class="o">/</span> <span class="p">(</span><span class="n">T</span><span class="o">-</span><span class="n">k</span><span class="p">)</span>
+    <span class="n">omega_22</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">v2_demeaned</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="n">K</span> <span class="o">*</span> <span class="n">v2_demeaned</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="p">:])</span> <span class="o">/</span> <span class="p">(</span><span class="n">T</span><span class="o">-</span><span class="n">k</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">omega_11</span><span class="p">,</span> <span class="n">omega_12</span><span class="p">,</span> <span class="n">omega_22</span>
+
+<span class="k">def</span> <span class="nf">compute_c_coefficients</span><span class="p">(</span><span class="n">omegas</span><span class="p">,</span> <span class="n">cv</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">k_val</span><span class="p">,</span> <span class="n">rho_k_til</span><span class="p">,</span> <span class="n">Q_2</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute the coefficients c_0_nd, c_1_nd, and c_2_nd.</span>
+<span class="sd">    </span>
+<span class="sd">    Args:</span>
+<span class="sd">    - omegas (tuple): Omega values (omegas_nd11, omegas_nd12, omegas_nd22)</span>
+<span class="sd">    - cv (float): Value of cv</span>
+<span class="sd">    - y (np.array): Input data array</span>
+<span class="sd">    - k_val (int): Parameter k value</span>
+<span class="sd">    - rho_k_til (float): Value of rho_k_til</span>
+<span class="sd">    - Q_2 (float): Value of Q_2</span>
+<span class="sd">    </span>
+<span class="sd">    Returns:</span>
+<span class="sd">    - tuple: Coefficients (c_0_nd, c_1_nd, c_2_nd)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="n">omegas_nd11</span><span class="p">,</span> <span class="n">omegas_nd12</span><span class="p">,</span> <span class="n">omegas_nd22</span> <span class="o">=</span> <span class="n">omegas</span>
+
+    <span class="n">T_minus_k</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">y</span><span class="p">)</span> <span class="o">-</span> <span class="n">k_val</span>
+    <span class="n">Q_2_inv_squared</span> <span class="o">=</span> <span class="n">Q_2</span> <span class="o">**</span> <span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">common_factor</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="n">T_minus_k</span><span class="p">)</span> <span class="o">*</span> <span class="n">Q_2_inv_squared</span> <span class="o">*</span> <span class="p">(</span><span class="n">cv</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+
+    <span class="n">c_2_nd</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">common_factor</span> <span class="o">*</span> <span class="n">omegas_nd22</span>
+    <span class="n">c_1_nd</span> <span class="o">=</span> <span class="n">common_factor</span> <span class="o">*</span> <span class="n">omegas_nd12</span> <span class="o">-</span> <span class="n">rho_k_til</span>
+    <span class="n">c_0_nd</span> <span class="o">=</span> <span class="p">(</span><span class="n">rho_k_til</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">-</span> <span class="n">common_factor</span> <span class="o">*</span> <span class="n">omegas_nd11</span>
+
+    <span class="k">return</span> <span class="n">c_2_nd</span><span class="p">,</span> <span class="n">c_1_nd</span><span class="p">,</span> <span class="n">c_0_nd</span>
+
+<span class="k">def</span> <span class="nf">quadratic_roots</span><span class="p">(</span><span class="n">c2</span><span class="p">,</span> <span class="n">c1</span><span class="p">,</span> <span class="n">c0</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate the roots of the equation: c2*a^2 + 2*c1*a + c0 = 0</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">    - c2 (float): Coefficient of a^2</span>
+<span class="sd">    - 2*c1 (float): Coefficient of a</span>
+<span class="sd">    - c0 (float): Constant term</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">    - tuple: Roots of the equation (root1, root2)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="c1"># Calculating the discriminant</span>
+    <span class="n">D</span> <span class="o">=</span> <span class="n">cmath</span><span class="o">.</span><span class="n">sqrt</span><span class="p">((</span><span class="mi">2</span><span class="o">*</span><span class="n">c1</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span> <span class="o">-</span> <span class="mi">4</span><span class="o">*</span><span class="n">c2</span><span class="o">*</span><span class="n">c0</span><span class="p">)</span>
+
+    <span class="c1"># Calculating the roots</span>
+    <span class="n">root1</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="o">*</span><span class="n">c1</span> <span class="o">+</span> <span class="n">D</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">c2</span><span class="p">)</span>
+    <span class="n">root2</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="o">*</span><span class="n">c1</span> <span class="o">-</span> <span class="n">D</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">c2</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">root1</span><span class="p">,</span> <span class="n">root2</span>
+
+<span class="k">def</span> <span class="nf">reg_estimating_equation_v1</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">lag</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Estimating equtation for autocorrelation, the first option</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">    - data (np.ndarray): The input data array. y_t from t=1 to T</span>
+<span class="sd">    - p (lag) (int): The lag order estimating equation</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">    - y (np.ndarray): y_t from t=p+1 to T</span>
+<span class="sd">    - x (np.ndarray): y_t-p</span>
+<span class="sd">    - nmp (int): The length of x (T - p).</span>
+<span class="sd">    - X (np.ndarray): T x 2 matrix with intercept and x</span>
+<span class="sd">    - coeffs (np.ndarray): The estimated coefficients from the estimating equation</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">lag</span><span class="p">)</span>
+    
+    <span class="n">T_data</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>  <span class="c1"># T</span>
+
+    <span class="c1"># Create y and x based on the lag order p</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">p</span><span class="p">:</span><span class="n">T_data</span><span class="p">,</span> <span class="p">:])</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">T_data</span> <span class="o">-</span> <span class="n">p</span><span class="p">,</span> <span class="p">:])</span>
+
+    <span class="c1"># Calculate nmp (T - p)</span>
+    <span class="n">nmp</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
+    <span class="c1"># Create a constant term for the regression</span>
+    <span class="n">cons</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">nmp</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+
+    <span class="c1"># Create the design matrix X</span>
+    <span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">((</span><span class="n">cons</span><span class="p">,</span> <span class="n">x</span><span class="p">))</span>
+
+    <span class="c1"># Calculate the coefficients based on the ordinary least squares (OLS) formula</span>
+    <span class="n">coeffs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">inv</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">transpose</span><span class="p">()</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">X</span><span class="p">))</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">transpose</span><span class="p">())</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">nmp</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">coeffs</span>
+
+<span class="k">def</span> <span class="nf">newLRV_vec</span><span class="p">(</span><span class="n">vhat</span><span class="p">,</span> <span class="n">M_n</span><span class="p">):</span>
+    <span class="n">vhat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">vhat</span><span class="p">)</span>
+    
+    <span class="n">n</span><span class="p">,</span> <span class="n">k</span> <span class="o">=</span> <span class="n">vhat</span><span class="o">.</span><span class="n">shape</span>
+    <span class="n">LRV</span> <span class="o">=</span> <span class="n">autocov_est</span><span class="p">(</span><span class="n">vhat</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+    
+    <span class="n">j_values</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
+    <span class="n">parzen_values</span> <span class="o">=</span> <span class="n">Parzen_vec</span><span class="p">(</span><span class="n">j_values</span> <span class="o">/</span> <span class="n">M_n</span><span class="p">)</span>
+    
+    <span class="n">autocov_values</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">autocov_est</span><span class="p">(</span><span class="n">vhat</span><span class="p">,</span> <span class="n">j</span><span class="p">)</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">j_values</span><span class="p">])</span>
+    
+    <span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="n">p_val</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">j_values</span><span class="p">,</span> <span class="n">parzen_values</span><span class="p">):</span>
+        <span class="n">LRV</span> <span class="o">+=</span> <span class="n">p_val</span> <span class="o">*</span> <span class="p">(</span><span class="n">autocov_values</span><span class="p">[</span><span class="n">j</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">autocov_values</span><span class="p">[</span><span class="n">j</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">LRV</span>
+
+<span class="k">def</span> <span class="nf">autocov_est</span><span class="p">(</span><span class="n">vhat</span><span class="p">,</span><span class="n">j</span><span class="p">):</span>
+    <span class="n">vhat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">vhat</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">j</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">T</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">vhat</span><span class="p">)</span>
+        <span class="n">v_t</span> <span class="o">=</span> <span class="n">vhat</span><span class="p">[</span><span class="n">j</span><span class="p">:</span><span class="n">T</span><span class="p">]</span>
+        <span class="n">v_tm1</span> <span class="o">=</span> <span class="n">vhat</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">T</span><span class="o">-</span><span class="n">j</span><span class="p">]</span>
+        <span class="n">gamma_hat_j</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">v_t</span><span class="o">.</span><span class="n">T</span><span class="p">,</span><span class="n">v_tm1</span><span class="p">)</span><span class="o">/</span><span class="n">T</span>
+        <span class="k">return</span> <span class="n">gamma_hat_j</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;j cannot be negative number&quot;</span><span class="p">)</span>
+        
+<span class="k">def</span> <span class="nf">Parzen_vec</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    
+    <span class="n">kx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    
+    <span class="n">mask1</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">x</span><span class="p">))</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mf">0.5</span><span class="p">)</span>
+    <span class="n">mask2</span> <span class="o">=</span> <span class="p">(</span><span class="mf">0.5</span> <span class="o">&lt;</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">x</span><span class="p">))</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">)</span>
+    
+    <span class="n">kx</span><span class="p">[</span><span class="n">mask1</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="mi">6</span> <span class="o">*</span> <span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">mask1</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="mi">6</span> <span class="o">*</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">mask1</span><span class="p">])</span> <span class="o">**</span> <span class="mi">3</span><span class="p">)</span>
+    <span class="n">kx</span><span class="p">[</span><span class="n">mask2</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="p">((</span><span class="mi">1</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">mask2</span><span class="p">]))</span> <span class="o">**</span> <span class="mi">3</span><span class="p">)</span>
+    
+    <span class="k">return</span> <span class="n">kx</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright .</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
