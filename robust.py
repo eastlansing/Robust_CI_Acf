@@ -7,7 +7,7 @@ import cmath
 class HAC_robust_conf_int:
 
     """
-    Implements the Heteroskedasticity and Autocorrelation Consistent (HAC) robust confidence intervals for autocorrelation analysis.
+    Implements the Heteroskedasticity and Autocorrelation Consistent (HAC) robust confidence intervals for autocorrelation functions.
 
     Parameters
     ----------
