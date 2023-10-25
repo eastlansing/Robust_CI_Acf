@@ -7,6 +7,7 @@ import os
 import sys
 sys.path.insert(0, os.path.abspath('..'))
 
+
 # -- Project information -----------------------------------------------------
 
 project = 'Robust_CI_Acf'
@@ -23,6 +24,9 @@ extensions = [
     'sphinx.ext.viewcode',
     'sphinx_rtd_theme'
 ]
+
+# Mock imports that might not be available during the documentation build
+autodoc_mock_imports = ["numpy", "matplotlib", "scipy", "copy", "cmath"]
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
