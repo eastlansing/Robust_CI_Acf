@@ -436,10 +436,26 @@ class HAC_robust_conf_int:
             plt.show()
             
     def get_estimated_acf(self):
+        """
+        Retrieve the estimated autocorrelation function values.
+
+        Returns
+        -------
+        list of float
+            List of estimated ACF values.
+        """
         return self.rho_est_values
     
     
     def get_confidence_interval(self):
+        """
+        Compute the confidence intervals for the ACF values.
+
+        Returns
+        -------
+        tuple of list of float
+            Lower and upper confidence interval bounds for each ACF value.
+        """
         if self.null_imp:
             return self.lower_values, self.upper_values
         else:
@@ -448,6 +464,14 @@ class HAC_robust_conf_int:
             return lower_bounds, upper_bounds
         
     def get_confidence_band(self):
+        """
+        Compute the confidence bands around zero for the ACF values.
+
+        Returns
+        -------
+        tuple of list of float
+            Lower and upper confidence band bounds for each ACF value.
+        """
         if self.null_imp:
             lower_bounds = [0 - cv * np.sqrt(var) for cv, var in zip(self.cv_values, self.var_res_under_zero_values)]
             upper_bounds = [0 + cv * np.sqrt(var) for cv, var in zip(self.cv_values, self.var_res_under_zero_values)]
@@ -458,21 +482,53 @@ class HAC_robust_conf_int:
             return lower_bounds, upper_bounds
         
     def get_null_imp_index(self):
+        """
+        Retrieve the index values if the null is imposed.
+
+        Returns
+        -------
+        list of int or None
+            List of index values if null is imposed; otherwise, print a message and return None.
+        """
         if self.null_imp:
             return self.index_values
         else:
             print ("Only null imposed has index")
     
     def get_cb_stata(self):
+        """
+        Compute the Stata-based confidence bands for the ACF values.
+
+        Returns
+        -------
+        tuple of list of float
+            Lower and upper Stata-based confidence band bounds for each ACF value.
+        """
         var_stata = self._calculate_var_stata_ori()
         upper_bounds = [0 + stats.norm.ppf(1 - self.alpha / 2) * np.sqrt(var) for var in var_stata]
         lower_bounds = [0 - stats.norm.ppf(1 - self.alpha / 2) * np.sqrt(var) for var in var_stata]
         return lower_bounds, upper_bounds
     
     def get_cv(self):
+        """
+        Retrieve the critical values used for confidence interval calculations.
+
+        Returns
+        -------
+        list of float
+            List of critical values.
+        """
         return self.cv_values
     
     def get_sample_autocorrelation(self):
+        """
+        Compute the sample autocorrelation for a given number of lags.
+
+        Returns
+        -------
+        list of float
+            List of sample autocorrelation values.
+        """
         return self._stacked_autocorrelation(len(self.rho_est_values))
 
 def calc_fixed_cv_org_alpha(fixed_b, Tnum, fixedb_coeffs, alpha):
