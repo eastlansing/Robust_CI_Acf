@@ -42,21 +42,7 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <!-- Local TOC -->
               <div class="local-toc"><ul>
-<li><a class="reference internal" href="#">robust module</a><ul>
-<li><a class="reference internal" href="#robust.HAC_robust_conf_int"><code class="docutils literal notranslate"><span class="pre">HAC_robust_conf_int</span></code></a><ul>
-<li><a class="reference internal" href="#robust.HAC_robust_conf_int.__init__"><code class="docutils literal notranslate"><span class="pre">HAC_robust_conf_int.__init__()</span></code></a></li>
-<li><a class="reference internal" href="#robust.HAC_robust_conf_int.plot_acf"><code class="docutils literal notranslate"><span class="pre">HAC_robust_conf_int.plot_acf()</span></code></a></li>
-<li><a class="reference internal" href="#robust.HAC_robust_conf_int.get_estimated_acf"><code class="docutils literal notranslate"><span class="pre">HAC_robust_conf_int.get_estimated_acf()</span></code></a></li>
-<li><a class="reference internal" href="#robust.HAC_robust_conf_int.get_confidence_interval"><code class="docutils literal notranslate"><span class="pre">HAC_robust_conf_int.get_confidence_interval()</span></code></a></li>
-<li><a class="reference internal" href="#robust.HAC_robust_conf_int.get_confidence_band"><code class="docutils literal notranslate"><span class="pre">HAC_robust_conf_int.get_confidence_band()</span></code></a></li>
-<li><a class="reference internal" href="#robust.HAC_robust_conf_int.get_null_imp_index"><code class="docutils literal notranslate"><span class="pre">HAC_robust_conf_int.get_null_imp_index()</span></code></a></li>
-<li><a class="reference internal" href="#robust.HAC_robust_conf_int.get_cb_stata"><code class="docutils literal notranslate"><span class="pre">HAC_robust_conf_int.get_cb_stata()</span></code></a></li>
-<li><a class="reference internal" href="#robust.HAC_robust_conf_int.get_cv"><code class="docutils literal notranslate"><span class="pre">HAC_robust_conf_int.get_cv()</span></code></a></li>
-<li><a class="reference internal" href="#robust.HAC_robust_conf_int.get_sample_autocorrelation"><code class="docutils literal notranslate"><span class="pre">HAC_robust_conf_int.get_sample_autocorrelation()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
+<li><a class="reference internal" href="#">robust module</a></li>
 </ul>
 </div>
         </div>
@@ -83,78 +69,8 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="module-robust">
-<span id="robust-module"></span><h1>robust module<a class="headerlink" href="#module-robust" title="Permalink to this heading"></a></h1>
-<dl class="py class">
-<dt class="sig sig-object py" id="robust.HAC_robust_conf_int">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">robust.</span></span><span class="sig-name descname"><span class="pre">HAC_robust_conf_int</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lag</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">null_imp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'fixedb'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bandwidth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'SPJ'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_trend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">diff</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.05</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/robust.html#HAC_robust_conf_int"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#robust.HAC_robust_conf_int" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>Implements the Heteroskedasticity and Autocorrelation Consistent (HAC) robust confidence intervals for autocorrelation analysis.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>data</strong> (<em>array-like</em>) – The input data series for which the HAC robust confidence intervals are to be calculated.</p></li>
-<li><p><strong>lag</strong> (<em>int</em>) – The maximum lag to be considered for autocorrelation.</p></li>
-<li><p><strong>null_imp</strong> (<em>bool</em><em>, </em><em>default=True</em>) – Indicates if the null hypothesis of no importance should be considered.</p></li>
-<li><p><strong>method</strong> (<em>str</em><em>, </em><em>default='fixedb'</em>) – The method used for estimation.</p></li>
-<li><p><strong>bandwidth</strong> (<em>str</em><em>, </em><em>default=&quot;SPJ&quot;</em>) – Specifies the bandwidth method used in the estimation.</p></li>
-<li><p><strong>time_trend</strong> (<em>bool</em><em>, </em><em>default=False</em>) – If True, a time trend is considered in the model.</p></li>
-<li><p><strong>diff</strong> (<em>bool</em><em>, </em><em>default=False</em>) – If True, calculates the difference series of the data.</p></li>
-<li><p><strong>alpha</strong> (<em>float</em><em>, </em><em>default=0.05</em>) – Significance level for the confidence interval.</p></li>
-</ul>
-</dd>
-</dl>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>Ensure that the provided parameters, especially ‘method’ and ‘bandwidth’, align with the domain-specific options available. The provided options are for demonstration purposes and may need further refinement.</p>
-</div>
-<dl class="py method">
-<dt class="sig sig-object py" id="robust.HAC_robust_conf_int.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lag</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">null_imp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'fixedb'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bandwidth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'SPJ'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_trend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">diff</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.05</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/robust.html#HAC_robust_conf_int.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#robust.HAC_robust_conf_int.__init__" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="robust.HAC_robust_conf_int.plot_acf">
-<span class="sig-name descname"><span class="pre">plot_acf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">CI_HAC</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">CB_HAC</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">CB_stata</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">CB_bart</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Autocorrelogram</span> <span class="pre">with</span> <span class="pre">HAC</span> <span class="pre">robust</span> <span class="pre">CI'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_as_pdf</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'autocorrelogram.pdf'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/robust.html#HAC_robust_conf_int.plot_acf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#robust.HAC_robust_conf_int.plot_acf" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="robust.HAC_robust_conf_int.get_estimated_acf">
-<span class="sig-name descname"><span class="pre">get_estimated_acf</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/robust.html#HAC_robust_conf_int.get_estimated_acf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#robust.HAC_robust_conf_int.get_estimated_acf" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="robust.HAC_robust_conf_int.get_confidence_interval">
-<span class="sig-name descname"><span class="pre">get_confidence_interval</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/robust.html#HAC_robust_conf_int.get_confidence_interval"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#robust.HAC_robust_conf_int.get_confidence_interval" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="robust.HAC_robust_conf_int.get_confidence_band">
-<span class="sig-name descname"><span class="pre">get_confidence_band</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/robust.html#HAC_robust_conf_int.get_confidence_band"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#robust.HAC_robust_conf_int.get_confidence_band" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="robust.HAC_robust_conf_int.get_null_imp_index">
-<span class="sig-name descname"><span class="pre">get_null_imp_index</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/robust.html#HAC_robust_conf_int.get_null_imp_index"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#robust.HAC_robust_conf_int.get_null_imp_index" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="robust.HAC_robust_conf_int.get_cb_stata">
-<span class="sig-name descname"><span class="pre">get_cb_stata</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/robust.html#HAC_robust_conf_int.get_cb_stata"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#robust.HAC_robust_conf_int.get_cb_stata" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="robust.HAC_robust_conf_int.get_cv">
-<span class="sig-name descname"><span class="pre">get_cv</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/robust.html#HAC_robust_conf_int.get_cv"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#robust.HAC_robust_conf_int.get_cv" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="robust.HAC_robust_conf_int.get_sample_autocorrelation">
-<span class="sig-name descname"><span class="pre">get_sample_autocorrelation</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/robust.html#HAC_robust_conf_int.get_sample_autocorrelation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#robust.HAC_robust_conf_int.get_sample_autocorrelation" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
+  <section id="robust-module">
+<h1>robust module<a class="headerlink" href="#robust-module" title="Permalink to this heading"></a></h1>
 </section>
 
 
