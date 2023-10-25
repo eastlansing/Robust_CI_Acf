@@ -1,3 +1,10 @@
+import numpy as np
+import matplotlib.pyplot as plt
+import numpy as np
+import scipy.stats as stats
+from copy import copy
+import cmath
+
 class HAC_robust_conf_int:
     
     """
@@ -34,7 +41,7 @@ class HAC_robust_conf_int:
     Ensure that the provided parameters, especially 'method' and 'bandwidth', align with the domain-specific options available. The provided options are for demonstration purposes and may need further refinement.
 
     """
-    
+
     def __init__(self, data, lag, null_imp=True, method='fixedb', bandwidth="SPJ", time_trend=False, diff=False, alpha=0.05):
         self.data = np.copy(np.asarray(data).reshape(-1, 1))
         self.lag = lag
@@ -192,7 +199,7 @@ class HAC_robust_conf_int:
         Calculates the variance estimator under null imposed for a given lag.
         
         Parameters:
-        - k (int): The lag order
+        - k (int): The lag order for the regression estimating equation.
         
         Returns:
         - var_res_under_zero11 (float): The element at index (1,1) of the variance estimates under null imposed.
@@ -438,3 +445,415 @@ class HAC_robust_conf_int:
     
     def get_sample_autocorrelation(self):
         return self._stacked_autocorrelation(len(self.rho_est_values))
+
+def calc_fixed_cv_org_alpha(fixed_b, Tnum, fixedb_coeffs, alpha):
+    """
+    Compute fixed-b critical values for t-test
+
+    Args:
+    - fixed_b: value of bandwidth (i.e. M)
+    - Tnum (int): length of time series, in this autocorrelation testing case, T-k
+    - fixedb_coeffs: List of fixed-b cv coefficients [c1, c2, ..., c9]
+
+    Returns:
+    - Scalar, fixed-b critical value
+    """
+    c = copy(fixedb_coeffs)  # shallow copy for list prevent mistake
+    n_cv = stats.norm.ppf(1 - alpha / 2)  # eg) stats.norm.ppf(0.975)
+
+    return n_cv + c[0] * (fixed_b / Tnum * n_cv) + c[1] * ((fixed_b / Tnum) * (n_cv ** 2)) + \
+           c[2] * ((fixed_b / Tnum) * (n_cv ** 3)) + \
+           c[3] * (((fixed_b / Tnum) ** 2) * n_cv) + c[4] * (((fixed_b / Tnum) ** 2) * (n_cv ** 2)) + \
+           c[5] * (((fixed_b / Tnum) ** 2) * (n_cv ** 3)) + \
+           c[6] * (((fixed_b / Tnum) ** 3) * (n_cv ** 1)) + c[7] * (((fixed_b / Tnum) ** 3) * (n_cv ** 2)) + \
+           c[8] * (((fixed_b / Tnum) ** 3) * (n_cv ** 3))
+
+def process_var_fixedbcv_alpha(vhat, M_n, X, nmp, fixedb_coeffs,alpha):
+    vhat = np.copy(vhat)
+    X =  np.copy(X)
+    fixedb_coeffs = copy(fixedb_coeffs)
+    
+    Q_inv = np.linalg.inv(np.dot(X.T, X))
+    LRV = newLRV_vec(vhat, M_n)
+    
+    var = np.linalg.multi_dot([Q_inv, LRV, Q_inv]) * nmp
+    fixed_cv = calc_fixed_cv_org_alpha(M_n, nmp, fixedb_coeffs,alpha)
+    #t_stat = (coeffs1 - true_acf1) / np.sqrt(np.float64(var[1, 1]))
+
+    return fixed_cv, var
+
+import numpy as np
+
+def regression_residuals(data, k):
+    """
+    Compute the beta_2 coefficient and residuals w_t after regressing 
+    the residuals from partialling out the effects of t and intercept
+    on y_t and y_t-k.
+    
+    Parameters:
+    - data: ndarray
+        Column vector containing the data series
+    - k: int
+        Lag value
+    
+    Returns:
+    - beta_2: float
+        Coefficient from regressing the residuals of y_t on y_t-k
+    - w_t: ndarray
+        Residuals from the regression
+    """
+    data = np.copy(data)
+    T_data = len(data)
+    
+    y_t = np.copy(data[k:T_data, :])
+    y_t_minus_k = np.copy(data[0:T_data - k, :])
+    t = np.arange(k + 1, T_data + 1).reshape(-1, 1)
+    
+    # Part 2: Partial out the effect of t and intercept on y_t and y_t-k
+    residuals_y_t = partial_regression(y_t, t, coef=False, cons=True)
+    residuals_y_t_minus_k = partial_regression(y_t_minus_k, t, coef=False, cons=True)
+
+    # Part 3: Regress the residuals on each other without intercept
+    beta_2, _ = partial_regression(residuals_y_t, residuals_y_t_minus_k, coef=True, cons=False)
+    
+    # w_t residuals from this regression
+    w_t = residuals_y_t - beta_2 * residuals_y_t_minus_k
+
+    return beta_2, w_t, residuals_y_t_minus_k
+
+def partial_regression(y, x, coef=False, cons=True):
+    """
+    Perform a regression of y on x and optionally return the coefficients.
+    
+    Parameters:
+    - y: ndarray
+        Dependent variable
+    - x: ndarray
+        Independent variable
+    - coef: bool (default: False)
+        If True, return coefficients
+    - cons: bool (default: True)
+        If True, include intercept in regression
+    
+    Returns:
+    - residuals: ndarray
+        Residuals from the regression
+    - gamma_1: float (optional)
+        Coefficient from the regression (if coef=True)
+    """
+    y = np.copy(y)
+    x = np.copy(x)
+    
+    y = np.array(y).reshape(-1, 1)
+    x = np.array(x).reshape(-1, 1)
+    
+    if cons:
+        cons_array = np.ones((len(x), 1))
+        X = np.hstack((cons_array, x))
+    else:
+        X = x
+
+    coeffs = np.linalg.inv(X.transpose().dot(X)).dot(X.transpose()).dot(y)
+    y_pred = X.dot(coeffs)
+    residuals = y - y_pred
+
+    if coef:
+        return coeffs.flatten(), residuals
+    else:
+        return residuals
+    
+def AD_band(vhat):
+    vhat = np.copy(vhat)
+    #vhat = np.copy(xuhat)
+    if vhat.shape[1] == 1:
+        pass
+    elif vhat.shape[1] == 2:
+        vhat = np.copy(np.reshape(vhat[:,1],(len(vhat[:,1]),1))) 
+    
+    T = len(vhat)
+
+    vhat_t = np.copy(vhat[1:])
+    vhat_tm1 = np.copy(vhat[:-1])
+    y2 = np.copy(vhat_t)
+    X2 = np.copy(vhat_tm1)
+    rho_hat = np.linalg.inv(X2.transpose().dot(X2)).dot(X2.transpose()).dot(y2) #without constant
+    #print (rho_hat)
+    #if (np.abs(rho_hat-1) < 0.001) & (rho_hat>=1):
+    #    rho_hat = 1.001
+    #elif (np.abs(rho_hat-1) < 0.001) & (rho_hat<1):
+    #    rho_hat = 0.999
+        
+    #if np.abs(rho_hat) >= 0.97:
+    #    rho_hat = 0.97*np.sign(rho_hat)
+
+    alpha_hat_2 = (4*(rho_hat)**2)/((1-rho_hat)**4) #univariate version CLP
+    ST = 2.6614*(T*alpha_hat_2)**(0.2) #bandwidth
+    ST = np.float64(ST)
+    
+    if ST > T:
+        ST = np.copy(T)
+    
+    return ST
+
+def noncen_chisq(k,j,x):
+    #k is df
+    #j is non-centrality parameter
+    pdf_v = 0.5*np.exp(-0.5*(x+j))*((x/j)**(k/4-0.5))*mpmath.besseli(0.5*k-1, np.sqrt(j*x), derivative=0)
+    pdf_v2 = np.float64(pdf_v)
+    return pdf_v2
+
+def chisq_dfone(x):
+    pdf_v = (np.exp(-x/2))/(np.sqrt(2*math.pi*x))
+    pdf_v2 = np.float64(pdf_v)
+    return pdf_v2
+
+def SPJ_band(vhat,w,z_a=1.96,delta=2,q=2,g=6,c=0.539):
+    #for Parzen
+    #z_a = 1.96 # w is tuning parameter
+    vhat = np.copy(vhat)
+
+    if vhat.shape[1] == 1:
+        pass
+    elif vhat.shape[1] == 2:
+        vhat = np.copy(np.reshape(vhat[:,1],(len(vhat[:,1]),1))) 
+    
+    T = len(vhat)
+
+    vhat_t = np.copy(vhat[1:])
+    vhat_tm1 = np.copy(vhat[:-1])
+    y2 = np.copy(vhat_t)
+    X2 = np.copy(vhat_tm1)
+    rho_hat = np.linalg.inv(X2.transpose().dot(X2)).dot(X2.transpose()).dot(y2) #without constant
+    
+    #if np.abs(rho_hat) >= 0.97:
+    #    rho_hat = 0.97*np.sign(rho_hat)
+    
+    d_hat = (2*rho_hat)/(1-rho_hat)**2
+    d_hat = np.float64(d_hat)
+    x_val = z_a**2
+    
+    ### calculation of b_hat
+    G_0 = chisq_dfone(x=x_val)
+    G_d = noncen_chisq(k=1,j=delta**2,x=x_val)
+    k_d = ((delta**2)/(2*x_val))*noncen_chisq(k=3,j=delta**2,x=x_val)
+    
+    if d_hat*(w*G_0 - G_d) > 0:
+        b_hat = (((q*g*d_hat*(w*G_0 - G_d))/(c*x_val*k_d))**(1/3))*(T**(-2/3))
+        #print (b_hat)
+    elif d_hat*(w*G_0 - G_d) <= 0:
+        b_hat = np.log(T)/T
+    else:
+        raise Exception("Error")
+    spj_band = b_hat * T
+    spj_band = np.float64(spj_band)
+    
+    if spj_band > T:
+        spj_band = np.copy(T)    
+    
+    return spj_band
+
+def create_spj_function(w, z_a=1.96, delta=2, q=2, g=6, c=0.539):
+    def spj_function(vhat):
+        return SPJ_band(vhat, w=w, z_a=z_a, delta=delta, q=q, g=g, c=c)
+    return spj_function
+
+def compute_Q2(y, k):
+    """
+    Compute Q2 value.
+    
+    Args:
+    - y (np.array): Input data array (time-series)
+    - k (int): lag k; i.e. rho_k
+    
+    Returns:
+    - float: Q2 value
+    """
+    
+    T = len(y)
+
+    # Compute the means
+    ybar_1_T_minus_k = np.mean(y[:T-k])
+
+    # Demeaning y values
+    y_tilda_minus_k = y[:T-k] - ybar_1_T_minus_k
+
+    # Compute Q2
+    Q2 = np.mean(y_tilda_minus_k**2)
+    
+    return Q2
+
+def parzen_k_function_vectorized(x):
+    """Vectorized Kernel Function."""
+    conditions = [
+        (abs(x) <= 0.5),
+        (abs(x) > 0.5) & (abs(x) <= 1)
+    ]
+    
+    outputs = [
+        1 - 6 * x**2 + 6 * abs(x)**3,
+        2 * (1 - abs(x))**3
+    ]
+    
+    return np.select(conditions, outputs, default=0)
+
+def compute_omegas_vectorized_demean(y, M, k_function, k):
+    y = y.reshape(-1, 1)
+    T = y.shape[0]
+
+    # Compute the means
+    ybar_1_T_minus_k = np.mean(y[:T-k])
+    ybar_k_plus_1_T = np.mean(y[k:T])
+
+    # Demeaning y values and computing v1 and v2
+    y_tilda = y[k:] - ybar_k_plus_1_T
+    y_tilda_minus_k = y[:T-k] - ybar_1_T_minus_k
+
+    v1 = (y_tilda * y_tilda_minus_k).squeeze()
+    v2 = (y_tilda_minus_k ** 2).squeeze()
+
+    # Calculate the means of v1 and v2 
+    mean_v1 = np.mean(v1)
+    mean_v2 = np.mean(v2)
+
+    # Demean v1 and v2
+    v1_demeaned = v1 - mean_v1
+    v2_demeaned = v2 - mean_v2
+
+    # Create the kernel matrix
+    indices_matrix = np.abs(np.arange(k+1, T+1)[:, None] - np.arange(k+1, T+1))
+    K = k_function(indices_matrix / M)
+
+    # Compute Omega values using demeaned v1 and v2
+    omega_11 = np.sum(v1_demeaned[:, None] * K * v1_demeaned[None, :]) / (T-k)
+    omega_12 = np.sum(v1_demeaned[:, None] * K * v2_demeaned[None, :]) / (T-k)
+    omega_22 = np.sum(v2_demeaned[:, None] * K * v2_demeaned[None, :]) / (T-k)
+
+    return omega_11, omega_12, omega_22
+
+def compute_c_coefficients(omegas, cv, y, k_val, rho_k_til, Q_2):
+    """
+    Compute the coefficients c_0_nd, c_1_nd, and c_2_nd.
+    
+    Args:
+    - omegas (tuple): Omega values (omegas_nd11, omegas_nd12, omegas_nd22)
+    - cv (float): Value of cv
+    - y (np.array): Input data array
+    - k_val (int): Parameter k value
+    - rho_k_til (float): Value of rho_k_til
+    - Q_2 (float): Value of Q_2
+    
+    Returns:
+    - tuple: Coefficients (c_0_nd, c_1_nd, c_2_nd)
+    """
+    
+    omegas_nd11, omegas_nd12, omegas_nd22 = omegas
+
+    T_minus_k = len(y) - k_val
+    Q_2_inv_squared = Q_2 ** (-2)
+    common_factor = (1 / T_minus_k) * Q_2_inv_squared * (cv ** 2)
+
+    c_2_nd = 1 - common_factor * omegas_nd22
+    c_1_nd = common_factor * omegas_nd12 - rho_k_til
+    c_0_nd = (rho_k_til ** 2) - common_factor * omegas_nd11
+
+    return c_2_nd, c_1_nd, c_0_nd
+
+def quadratic_roots(c2, c1, c0):
+    """
+    Calculate the roots of the equation: c2*a^2 + 2*c1*a + c0 = 0
+
+    Args:
+    - c2 (float): Coefficient of a^2
+    - 2*c1 (float): Coefficient of a
+    - c0 (float): Constant term
+
+    Returns:
+    - tuple: Roots of the equation (root1, root2)
+    """
+    
+    # Calculating the discriminant
+    D = cmath.sqrt((2*c1)**2 - 4*c2*c0)
+
+    # Calculating the roots
+    root1 = (-2*c1 + D) / (2*c2)
+    root2 = (-2*c1 - D) / (2*c2)
+
+    return root1, root2
+
+def reg_estimating_equation_v1(data, lag):
+    """
+    Estimating equtation for autocorrelation, the first option
+
+    Parameters:
+    - data (np.ndarray): The input data array. y_t from t=1 to T
+    - p (lag) (int): The lag order estimating equation
+
+    Returns:
+    - y (np.ndarray): y_t from t=p+1 to T
+    - x (np.ndarray): y_t-p
+    - nmp (int): The length of x (T - p).
+    - X (np.ndarray): T x 2 matrix with intercept and x
+    - coeffs (np.ndarray): The estimated coefficients from the estimating equation
+    """
+    data = np.copy(data)
+    p = np.copy(lag)
+    
+    T_data = len(data)  # T
+
+    # Create y and x based on the lag order p
+    y = np.copy(data[p:T_data, :])
+    x = np.copy(data[0:T_data - p, :])
+
+    # Calculate nmp (T - p)
+    nmp = len(x)
+
+    # Create a constant term for the regression
+    cons = np.ones((nmp, 1))
+
+    # Create the design matrix X
+    X = np.hstack((cons, x))
+
+    # Calculate the coefficients based on the ordinary least squares (OLS) formula
+    coeffs = np.linalg.inv(X.transpose().dot(X)).dot(X.transpose()).dot(y)
+
+    return y, x, nmp, X, coeffs
+
+def newLRV_vec(vhat, M_n):
+    vhat = np.copy(vhat)
+    
+    n, k = vhat.shape
+    LRV = autocov_est(vhat, 0)
+    
+    j_values = np.arange(1, n)
+    parzen_values = Parzen_vec(j_values / M_n)
+    
+    autocov_values = np.array([autocov_est(vhat, j) for j in j_values])
+    
+    for j, p_val in zip(j_values, parzen_values):
+        LRV += p_val * (autocov_values[j-1] + autocov_values[j-1].T)
+
+    return LRV
+
+def autocov_est(vhat,j):
+    vhat = np.copy(vhat)
+    if j >= 0:
+        T = len(vhat)
+        v_t = vhat[j:T]
+        v_tm1 = vhat[0:T-j]
+        gamma_hat_j = np.dot(v_t.T,v_tm1)/T
+        return gamma_hat_j
+    else:
+        raise ValueError("j cannot be negative number")
+        
+def Parzen_vec(x):
+    x = np.copy(x)
+    
+    kx = np.zeros_like(x)
+    
+    mask1 = (0 <= np.abs(x)) & (np.abs(x) <= 0.5)
+    mask2 = (0.5 < np.abs(x)) & (np.abs(x) <= 1)
+    
+    kx[mask1] = 1 - 6 * (x[mask1] ** 2) + 6 * (np.abs(x[mask1]) ** 3)
+    kx[mask2] = 2 * ((1 - np.abs(x[mask2])) ** 3)
+    
+    return kx
