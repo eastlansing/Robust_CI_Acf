@@ -6,6 +6,7 @@
 import os
 import sys
 sys.path.insert(0, os.path.abspath('..'))
+import robust  # Ensure this line doesn't cause any errors
 
 # -- Project information -----------------------------------------------------
 
