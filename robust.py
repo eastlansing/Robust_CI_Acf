@@ -37,7 +37,7 @@ class HAC_robust_conf_int:
 
     Note
     ----
-    Ensure that the provided parameters, especially 'method' and 'bandwidth', align with the domain-specific options available. The provided options are for demonstration purposes and may need further refinement.
+    The provided options are for demonstration purposes and may need further refinement.
 
     """
 
