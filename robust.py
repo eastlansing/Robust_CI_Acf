@@ -1,12 +1,11 @@
 import numpy as np
 import matplotlib.pyplot as plt
-import numpy as np
 import scipy.stats as stats
 from copy import copy
 import cmath
 
 class HAC_robust_conf_int:
-    
+
     """
     Implements the Heteroskedasticity and Autocorrelation Consistent (HAC) robust confidence intervals for autocorrelation analysis.
 
@@ -481,8 +480,6 @@ def process_var_fixedbcv_alpha(vhat, M_n, X, nmp, fixedb_coeffs,alpha):
     #t_stat = (coeffs1 - true_acf1) / np.sqrt(np.float64(var[1, 1]))
 
     return fixed_cv, var
-
-import numpy as np
 
 def regression_residuals(data, k):
     """
