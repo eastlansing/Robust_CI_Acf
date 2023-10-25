@@ -224,6 +224,36 @@ class HAC_robust_conf_int:
         return var_res_under_zero11
 
     def plot_acf(self, CI_HAC=True, CB_HAC=False, CB_stata=False, CB_bart=False, title="Autocorrelogram with HAC robust CI", save_as_pdf=False, filename="autocorrelogram.pdf"):
+        """
+        Plot the autocorrelation function (ACF).
+
+        Parameters
+        ----------
+        CI_HAC : bool, default=True
+            Whether to plot HAC robust confidence intervals.
+        CB_HAC : bool, default=False
+            Whether to plot HAC robust confidence bands.
+        CB_stata : bool, default=False
+            Whether to plot the Stata confidence bands.
+        CB_bart : bool, default=False
+            Whether to plot the Bartlett confidence bands.
+        title : str, default="Autocorrelogram with HAC robust CI"
+            Title for the plot.
+        save_as_pdf : bool, default=False
+            If True, save the plot as a PDF, otherwise display it.
+        filename : str, default="autocorrelogram.pdf"
+            Filename for saving the plot if save_as_pdf is True.
+
+        Returns
+        -------
+        fig : matplotlib.figure.Figure
+            The Matplotlib figure object containing the ACF plot.
+
+        Notes
+        -----
+        This method selects the appropriate sub-routine for plotting based on the null_imp attribute.
+        """
+
         if self.null_imp:
             self._plot_acf_null_imp(CI_HAC, CB_HAC, CB_stata, CB_bart, title, save_as_pdf, filename)
         else:
