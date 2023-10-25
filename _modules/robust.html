@@ -68,13 +68,12 @@
   <h1>Source code for robust</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">scipy.stats</span> <span class="k">as</span> <span class="nn">stats</span>
 <span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">copy</span>
 <span class="kn">import</span> <span class="nn">cmath</span>
 
 <div class="viewcode-block" id="HAC_robust_conf_int"><a class="viewcode-back" href="../module_robust.html#robust.HAC_robust_conf_int">[docs]</a><span class="k">class</span> <span class="nc">HAC_robust_conf_int</span><span class="p">:</span>
-<span class="w">    </span>
+
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Implements the Heteroskedasticity and Autocorrelation Consistent (HAC) robust confidence intervals for autocorrelation analysis.</span>
 
@@ -549,8 +548,6 @@
     <span class="c1">#t_stat = (coeffs1 - true_acf1) / np.sqrt(np.float64(var[1, 1]))</span>
 
     <span class="k">return</span> <span class="n">fixed_cv</span><span class="p">,</span> <span class="n">var</span>
-
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
 <span class="k">def</span> <span class="nf">regression_residuals</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">k</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
