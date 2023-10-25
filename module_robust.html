@@ -116,7 +116,29 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="robust.HAC_robust_conf_int.plot_acf">
 <span class="sig-name descname"><span class="pre">plot_acf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">CI_HAC</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">CB_HAC</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">CB_stata</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">CB_bart</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Autocorrelogram</span> <span class="pre">with</span> <span class="pre">HAC</span> <span class="pre">robust</span> <span class="pre">CI'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_as_pdf</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'autocorrelogram.pdf'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/robust.html#HAC_robust_conf_int.plot_acf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#robust.HAC_robust_conf_int.plot_acf" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Plot the autocorrelation function (ACF).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>CI_HAC</strong> (<em>bool</em><em>, </em><em>default=True</em>) – Whether to plot HAC robust confidence intervals.</p></li>
+<li><p><strong>CB_HAC</strong> (<em>bool</em><em>, </em><em>default=False</em>) – Whether to plot HAC robust confidence bands.</p></li>
+<li><p><strong>CB_stata</strong> (<em>bool</em><em>, </em><em>default=False</em>) – Whether to plot the Stata confidence bands.</p></li>
+<li><p><strong>CB_bart</strong> (<em>bool</em><em>, </em><em>default=False</em>) – Whether to plot the Bartlett confidence bands.</p></li>
+<li><p><strong>title</strong> (<em>str</em><em>, </em><em>default=&quot;Autocorrelogram with HAC robust CI&quot;</em>) – Title for the plot.</p></li>
+<li><p><strong>save_as_pdf</strong> (<em>bool</em><em>, </em><em>default=False</em>) – If True, save the plot as a PDF, otherwise display it.</p></li>
+<li><p><strong>filename</strong> (<em>str</em><em>, </em><em>default=&quot;autocorrelogram.pdf&quot;</em>) – Filename for saving the plot if save_as_pdf is True.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>fig</strong> – The Matplotlib figure object containing the ACF plot.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>matplotlib.figure.Figure</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>This method selects the appropriate sub-routine for plotting based on the null_imp attribute.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="robust.HAC_robust_conf_int.get_estimated_acf">

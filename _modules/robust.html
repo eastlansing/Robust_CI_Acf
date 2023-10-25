@@ -292,6 +292,36 @@
         <span class="k">return</span> <span class="n">var_res_under_zero11</span>
 
 <div class="viewcode-block" id="HAC_robust_conf_int.plot_acf"><a class="viewcode-back" href="../module_robust.html#robust.HAC_robust_conf_int.plot_acf">[docs]</a>    <span class="k">def</span> <span class="nf">plot_acf</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">CI_HAC</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">CB_HAC</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">CB_stata</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">CB_bart</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Autocorrelogram with HAC robust CI&quot;</span><span class="p">,</span> <span class="n">save_as_pdf</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="s2">&quot;autocorrelogram.pdf&quot;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Plot the autocorrelation function (ACF).</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        CI_HAC : bool, default=True</span>
+<span class="sd">            Whether to plot HAC robust confidence intervals.</span>
+<span class="sd">        CB_HAC : bool, default=False</span>
+<span class="sd">            Whether to plot HAC robust confidence bands.</span>
+<span class="sd">        CB_stata : bool, default=False</span>
+<span class="sd">            Whether to plot the Stata confidence bands.</span>
+<span class="sd">        CB_bart : bool, default=False</span>
+<span class="sd">            Whether to plot the Bartlett confidence bands.</span>
+<span class="sd">        title : str, default=&quot;Autocorrelogram with HAC robust CI&quot;</span>
+<span class="sd">            Title for the plot.</span>
+<span class="sd">        save_as_pdf : bool, default=False</span>
+<span class="sd">            If True, save the plot as a PDF, otherwise display it.</span>
+<span class="sd">        filename : str, default=&quot;autocorrelogram.pdf&quot;</span>
+<span class="sd">            Filename for saving the plot if save_as_pdf is True.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        fig : matplotlib.figure.Figure</span>
+<span class="sd">            The Matplotlib figure object containing the ACF plot.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        This method selects the appropriate sub-routine for plotting based on the null_imp attribute.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">null_imp</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_plot_acf_null_imp</span><span class="p">(</span><span class="n">CI_HAC</span><span class="p">,</span> <span class="n">CB_HAC</span><span class="p">,</span> <span class="n">CB_stata</span><span class="p">,</span> <span class="n">CB_bart</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">save_as_pdf</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
