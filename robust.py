@@ -20,21 +20,21 @@ class HAC_robust_conf_int:
     the valid confidence intervals by Hwang and Vogelsang (2023) across multiple lags for your time series data 
     so that empirical practitioners can easily obtain valid confidence intervals (and confidence bands) for empirical anaylsis of time series data.
 
-
     Parameters
     ----------
     
     data : array-like
-        The input time series for which the HAC robust confidence intervals are to be calculated.
+        The input time series data.
     
     lag : int
         The maximum lag to be considered for autocorrelation functions.
     
     null_imp : bool, default=True
-        Indicates if the null hypothesis of no importance should be considered.
+        If true, the null imposed variance estimator is used for inference. If false, then it uses the null not imposed variance estimator. For null imposed
+        and null not imposed estimators, see Lazarus, Lewis, Stock and Watson (2018).
     
-    method : str, default='fixedb'
-        The method used for estimation.
+    method : {"fixedb", "OS", "normal"}, default='fixedb'
+        The asymptotics and the following critical values used for estimation.
     
     bandwidth : {"SPJ", "AD"}, default="SPJ"
         Specifies the data dependent bandwidth selection method used in the estimation. "SPJ" is a testing optimal data depdendent bandwidth selection method
@@ -53,7 +53,7 @@ class HAC_robust_conf_int:
 
     Note
     ----
-    The provided options are for demonstration purposes and may need further refinement.
+    The provided options may need further refinement.
 
     """
 
@@ -241,7 +241,7 @@ class HAC_robust_conf_int:
 
     def plot_acf(self, CI_HAC=True, CB_HAC=False, CB_stata=False, CB_bart=False, title="Autocorrelogram with HAC robust CI", save_as_pdf=False, filename="autocorrelogram.pdf"):
         """
-        Plot the autocorrelation function (ACF).
+        Plot the autocorrelation functions (ACF).
 
         Parameters
         ----------
@@ -253,13 +253,14 @@ class HAC_robust_conf_int:
             Whether to plot the Stata confidence bands.
         CB_bart : bool, default=False
             Whether to plot the Bartlett confidence bands.
-        title : str, default="Autocorrelogram with HAC robust CI"
+        title : str, default='Autocorrelogram with HAC robust CI'
             Title for the plot.
         save_as_pdf : bool, default=False
             If True, save the plot as a PDF, otherwise display it.
-        filename : str, default="autocorrelogram.pdf"
+        filename : str, default='autocorrelogram.pdf'
             Filename for saving the plot if save_as_pdf is True.
 
+            
         Returns
         -------
         fig : matplotlib.figure.Figure
