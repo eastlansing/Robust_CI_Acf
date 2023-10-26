@@ -100,34 +100,28 @@ about the model for the data generating process.</p>
 This class and following methods provide a graph of autocorrelogram with the estimated autocorrelation functions and
 the valid confidence intervals by Hwang and Vogelsang (2023) across multiple lags for your time series data
 so that empirical practitioners can easily obtain valid confidence intervals (and confidence bands) for empirical anaylsis of time series data.</p>
-<section id="parameters">
-<h2>Parameters<a class="headerlink" href="#parameters" title="Permalink to this heading"></a></h2>
-<dl class="simple">
-<dt>data<span class="classifier">array-like</span></dt><dd><p>The input time series data.</p>
-</dd>
-<dt>lag<span class="classifier">int</span></dt><dd><p>The maximum lag to be considered for autocorrelation functions.</p>
-</dd>
-<dt>null_imp<span class="classifier">bool, default=True</span></dt><dd><p>If true, the null imposed variance estimator is used for inference. If false, then it uses the null not imposed variance estimator. For null imposed
-and null not imposed estimators, see Lazarus, Lewis, Stock and Watson (2018).</p>
-</dd>
-<dt>method<span class="classifier">{“fixedb”, “OS”, “normal”}, default=’fixedb’</span></dt><dd><p>The asymptotics and the following critical values used for estimation.</p>
-</dd>
-<dt>bandwidth<span class="classifier">{“SPJ”, “AD”}, default=”SPJ”</span></dt><dd><p>Specifies the data dependent bandwidth selection method used in the estimation. “SPJ” is a testing optimal data depdendent bandwidth selection method
-suggested in Sun, Phillips and Jin (2008). “AD” is a MSE optimal method by Andrews (1991).</p>
-</dd>
-<dt>time_trend<span class="classifier">bool, default=False</span></dt><dd><p>If True, a time trend is considered in the estimating equation. To be able to obtain bandwidth by the data dependent selection methods,
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<em>array-like</em>) – The input time series data.</p></li>
+<li><p><strong>lag</strong> (<em>int</em>) – The maximum lag to be considered for autocorrelation functions.</p></li>
+<li><p><strong>null_imp</strong> (<em>bool</em><em>, </em><em>default=True</em>) – If true, the null imposed variance estimator is used for inference. If false, then it uses the null not imposed variance estimator. For null imposed
+and null not imposed estimators, see Lazarus, Lewis, Stock and Watson (2018).</p></li>
+<li><p><strong>method</strong> (<em>{&quot;fixedb&quot;</em><em>, </em><em>&quot;OS&quot;</em><em>, </em><em>&quot;normal&quot;}</em><em>, </em><em>default='fixedb'</em>) – The asymptotics and the following critical values used for estimation.</p></li>
+<li><p><strong>bandwidth</strong> (<em>{&quot;SPJ&quot;</em><em>, </em><em>&quot;AD&quot;}</em><em>, </em><em>default=&quot;SPJ&quot;</em>) – Specifies the data dependent bandwidth selection method used in the estimation. “SPJ” is a testing optimal data depdendent bandwidth selection method
+suggested in Sun, Phillips and Jin (2008). “AD” is a MSE optimal method by Andrews (1991).</p></li>
+<li><p><strong>time_trend</strong> (<em>bool</em><em>, </em><em>default=False</em>) – If True, a time trend is considered in the estimating equation. To be able to obtain bandwidth by the data dependent selection methods,
 we use Frisch–Waugh–Lovell theorem to partial out the time trend and obtain the residuals for the bandwidth calculation, instead of full regression.
-If false, the usual regression is used for the estimating equation.</p>
-</dd>
-<dt>diff<span class="classifier">bool, default=False</span></dt><dd><p>If True, the time series data is differenced and the differenced time series is used for autocorrelogram and output.</p>
-</dd>
-<dt>alpha<span class="classifier">float, default=0.05</span></dt><dd><p>Significance level for the confidence intervals and the confidence bands.</p>
+If false, the usual regression is used for the estimating equation.</p></li>
+<li><p><strong>diff</strong> (<em>bool</em><em>, </em><em>default=False</em>) – If True, the time series data is differenced and the differenced time series is used for autocorrelogram and output.</p></li>
+<li><p><strong>alpha</strong> (<em>float</em><em>, </em><em>default=0.05</em>) – Significance level for the confidence intervals and the confidence bands.</p></li>
+</ul>
 </dd>
 </dl>
-</section>
-<section id="note">
-<h2>Note<a class="headerlink" href="#note" title="Permalink to this heading"></a></h2>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
 <p>The provided options may need further refinement.</p>
+</div>
 <dl class="py method">
 <dt class="sig sig-object py" id="robust.HAC_robust_conf_int.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lag</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">null_imp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'fixedb'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bandwidth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'SPJ'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_trend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">diff</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.05</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/robust.html#HAC_robust_conf_int.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#robust.HAC_robust_conf_int.__init__" title="Permalink to this definition"></a></dt>
@@ -137,130 +131,127 @@ If false, the usual regression is used for the estimating equation.</p>
 <dt class="sig sig-object py" id="robust.HAC_robust_conf_int.plot_acf">
 <span class="sig-name descname"><span class="pre">plot_acf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">CI_HAC</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">CB_HAC</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">CB_stata</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">CB_bart</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Autocorrelogram</span> <span class="pre">with</span> <span class="pre">HAC</span> <span class="pre">robust</span> <span class="pre">CI'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_as_pdf</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'autocorrelogram.pdf'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/robust.html#HAC_robust_conf_int.plot_acf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#robust.HAC_robust_conf_int.plot_acf" title="Permalink to this definition"></a></dt>
 <dd><p>Plot the autocorrelation functions (ACF).</p>
-<section id="id1">
-<h3>Parameters<a class="headerlink" href="#id1" title="Permalink to this heading"></a></h3>
-<dl class="simple">
-<dt>CI_HAC<span class="classifier">bool, default=True</span></dt><dd><p>Whether to plot HAC robust confidence intervals.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>CI_HAC</strong> (<em>bool</em><em>, </em><em>default=True</em>) – Whether to plot HAC robust confidence intervals.</p></li>
+<li><p><strong>CB_HAC</strong> (<em>bool</em><em>, </em><em>default=False</em>) – Whether to plot HAC robust confidence bands.</p></li>
+<li><p><strong>CB_stata</strong> (<em>bool</em><em>, </em><em>default=False</em>) – Whether to plot the Stata confidence bands.</p></li>
+<li><p><strong>CB_bart</strong> (<em>bool</em><em>, </em><em>default=False</em>) – Whether to plot the Bartlett confidence bands.</p></li>
+<li><p><strong>title</strong> (<em>str</em><em>, </em><em>default='Autocorrelogram with HAC robust CI'</em>) – Title for the plot.</p></li>
+<li><p><strong>save_as_pdf</strong> (<em>bool</em><em>, </em><em>default=False</em>) – If True, save the plot as a PDF, otherwise display it.</p></li>
+<li><p><strong>filename</strong> (<em>str</em><em>, </em><em>default='autocorrelogram.pdf'</em>) – Filename for saving the plot if save_as_pdf is True.</p></li>
+</ul>
 </dd>
-<dt>CB_HAC<span class="classifier">bool, default=False</span></dt><dd><p>Whether to plot HAC robust confidence bands.</p>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>fig</strong> – The Matplotlib figure object containing the ACF plot.</p>
 </dd>
-<dt>CB_stata<span class="classifier">bool, default=False</span></dt><dd><p>Whether to plot the Stata confidence bands.</p>
-</dd>
-<dt>CB_bart<span class="classifier">bool, default=False</span></dt><dd><p>Whether to plot the Bartlett confidence bands.</p>
-</dd>
-<dt>title<span class="classifier">str, default=’Autocorrelogram with HAC robust CI’</span></dt><dd><p>Title for the plot.</p>
-</dd>
-<dt>save_as_pdf<span class="classifier">bool, default=False</span></dt><dd><p>If True, save the plot as a PDF, otherwise display it.</p>
-</dd>
-<dt>filename<span class="classifier">str, default=’autocorrelogram.pdf’</span></dt><dd><p>Filename for saving the plot if save_as_pdf is True.</p>
-</dd>
-</dl>
-</section>
-<section id="returns">
-<h3>Returns<a class="headerlink" href="#returns" title="Permalink to this heading"></a></h3>
-<dl class="simple">
-<dt>fig<span class="classifier">matplotlib.figure.Figure</span></dt><dd><p>The Matplotlib figure object containing the ACF plot.</p>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>matplotlib.figure.Figure</p>
 </dd>
 </dl>
-</section>
-<section id="notes">
-<h3>Notes<a class="headerlink" href="#notes" title="Permalink to this heading"></a></h3>
+<p class="rubric">Notes</p>
 <p>This method plots autocorrelogram with confidence intervals and confidence bands</p>
-</section>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="robust.HAC_robust_conf_int.get_estimated_acf">
 <span class="sig-name descname"><span class="pre">get_estimated_acf</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/robust.html#HAC_robust_conf_int.get_estimated_acf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#robust.HAC_robust_conf_int.get_estimated_acf" title="Permalink to this definition"></a></dt>
 <dd><p>Retrieve the estimated autocorrelation function values.</p>
-<section id="id2">
-<h3>Returns<a class="headerlink" href="#id2" title="Permalink to this heading"></a></h3>
-<dl class="simple">
-<dt>list of float</dt><dd><p>List of estimated ACF values.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>List of estimated ACF values.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>list of float</p>
 </dd>
 </dl>
-</section>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="robust.HAC_robust_conf_int.get_confidence_interval">
 <span class="sig-name descname"><span class="pre">get_confidence_interval</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/robust.html#HAC_robust_conf_int.get_confidence_interval"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#robust.HAC_robust_conf_int.get_confidence_interval" title="Permalink to this definition"></a></dt>
 <dd><p>Compute the confidence intervals for the ACF values.</p>
-<section id="id3">
-<h3>Returns<a class="headerlink" href="#id3" title="Permalink to this heading"></a></h3>
-<dl class="simple">
-<dt>tuple of list of float</dt><dd><p>Lower and upper confidence interval bounds for each ACF value.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Lower and upper confidence interval bounds for each ACF value.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>tuple of list of float</p>
 </dd>
 </dl>
-</section>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="robust.HAC_robust_conf_int.get_confidence_band">
 <span class="sig-name descname"><span class="pre">get_confidence_band</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/robust.html#HAC_robust_conf_int.get_confidence_band"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#robust.HAC_robust_conf_int.get_confidence_band" title="Permalink to this definition"></a></dt>
 <dd><p>Compute the confidence bands around zero for the ACF values.</p>
-<section id="id4">
-<h3>Returns<a class="headerlink" href="#id4" title="Permalink to this heading"></a></h3>
-<dl class="simple">
-<dt>tuple of list of float</dt><dd><p>Lower and upper confidence band bounds for each ACF value.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Lower and upper confidence band bounds for each ACF value.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>tuple of list of float</p>
 </dd>
 </dl>
-</section>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="robust.HAC_robust_conf_int.get_null_imp_index">
 <span class="sig-name descname"><span class="pre">get_null_imp_index</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/robust.html#HAC_robust_conf_int.get_null_imp_index"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#robust.HAC_robust_conf_int.get_null_imp_index" title="Permalink to this definition"></a></dt>
 <dd><p>Retrieve the index values if the null is imposed.</p>
-<section id="id5">
-<h3>Returns<a class="headerlink" href="#id5" title="Permalink to this heading"></a></h3>
-<dl class="simple">
-<dt>list of int or None</dt><dd><p>List of index values if null is imposed; otherwise, print a message and return None.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>List of index values if null is imposed; otherwise, print a message and return None.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>list of int or None</p>
 </dd>
 </dl>
-</section>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="robust.HAC_robust_conf_int.get_cb_stata">
 <span class="sig-name descname"><span class="pre">get_cb_stata</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/robust.html#HAC_robust_conf_int.get_cb_stata"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#robust.HAC_robust_conf_int.get_cb_stata" title="Permalink to this definition"></a></dt>
 <dd><p>Compute the Stata-based confidence bands for the ACF values.</p>
-<section id="id6">
-<h3>Returns<a class="headerlink" href="#id6" title="Permalink to this heading"></a></h3>
-<dl class="simple">
-<dt>tuple of list of float</dt><dd><p>Lower and upper Stata-based confidence band bounds for each ACF value.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Lower and upper Stata-based confidence band bounds for each ACF value.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>tuple of list of float</p>
 </dd>
 </dl>
-</section>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="robust.HAC_robust_conf_int.get_cv">
 <span class="sig-name descname"><span class="pre">get_cv</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/robust.html#HAC_robust_conf_int.get_cv"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#robust.HAC_robust_conf_int.get_cv" title="Permalink to this definition"></a></dt>
 <dd><p>Retrieve the critical values used for confidence interval calculations.</p>
-<section id="id7">
-<h3>Returns<a class="headerlink" href="#id7" title="Permalink to this heading"></a></h3>
-<dl class="simple">
-<dt>list of float</dt><dd><p>List of critical values.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>List of critical values.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>list of float</p>
 </dd>
 </dl>
-</section>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="robust.HAC_robust_conf_int.get_sample_autocorrelation">
 <span class="sig-name descname"><span class="pre">get_sample_autocorrelation</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/robust.html#HAC_robust_conf_int.get_sample_autocorrelation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#robust.HAC_robust_conf_int.get_sample_autocorrelation" title="Permalink to this definition"></a></dt>
 <dd><p>Compute the sample autocorrelation for a given number of lags.</p>
-<section id="id8">
-<h3>Returns<a class="headerlink" href="#id8" title="Permalink to this heading"></a></h3>
-<dl class="simple">
-<dt>list of float</dt><dd><p>List of sample autocorrelation values.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>List of sample autocorrelation values.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>list of float</p>
 </dd>
 </dl>
-</section>
 </dd></dl>
 
-</section>
 </dd></dl>
 
 </section>
