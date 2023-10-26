@@ -112,16 +112,16 @@ so that empirical practitioners can easily obtain valid confidence intervals (an
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>data</strong> (<em>array-like</em>) – The input time series data.</p></li>
 <li><p><strong>lag</strong> (<em>int</em>) – The maximum lag to be considered for autocorrelation functions.</p></li>
-<li><p><strong>null_imp</strong> (<em>bool</em><em>, </em><em>default=True</em>) – If true, the null imposed variance estimator is used for inference. If false, then it uses the null not imposed variance estimator. For null imposed
+<li><p><strong>null_imp</strong> (<em>bool, default=True</em>) – If true, the null imposed variance estimator is used for inference. If false, then it uses the null not imposed variance estimator. For null imposed
 and null not imposed estimators, see Lazarus, Lewis, Stock and Watson (2018).</p></li>
-<li><p><strong>method</strong> (<em>{&quot;fixedb&quot;</em><em>, </em><em>&quot;OS&quot;</em><em>, </em><em>&quot;normal&quot;}</em><em>, </em><em>default='fixedb'</em>) – The asymptotics and the following critical values used for estimation.</p></li>
-<li><p><strong>bandwidth</strong> (<em>{&quot;SPJ&quot;</em><em>, </em><em>&quot;AD&quot;}</em><em>, </em><em>default=&quot;SPJ&quot;</em>) – Specifies the data dependent bandwidth selection method used in the estimation. “SPJ” is a testing optimal data depdendent bandwidth selection method
+<li><p><strong>method</strong> (<em>{“fixedb”, “OS”, “normal”}, default=’fixedb’</em>) – The asymptotics and the following critical values used for estimation.</p></li>
+<li><p><strong>bandwidth</strong> (<em>{“SPJ”, “AD”}, default=”SPJ”</em>) – Specifies the data dependent bandwidth selection method used in the estimation. “SPJ” is a testing optimal data depdendent bandwidth selection method
 suggested in Sun, Phillips and Jin (2008). “AD” is a MSE optimal method by Andrews (1991).</p></li>
-<li><p><strong>time_trend</strong> (<em>bool</em><em>, </em><em>default=False</em>) – If True, a time trend is considered in the estimating equation. To be able to obtain bandwidth by the data dependent selection methods,
+<li><p><strong>time_trend</strong> (<em>bool, default=False</em>) – If True, a time trend is considered in the estimating equation. To be able to obtain bandwidth by the data dependent selection methods,
 we use Frisch–Waugh–Lovell theorem to partial out the time trend and obtain the residuals for the bandwidth calculation, instead of full regression.
 If false, the usual regression is used for the estimating equation.</p></li>
-<li><p><strong>diff</strong> (<em>bool</em><em>, </em><em>default=False</em>) – If True, the time series data is differenced and the differenced time series is used for autocorrelogram and output.</p></li>
-<li><p><strong>alpha</strong> (<em>float</em><em>, </em><em>default=0.05</em>) – Significance level for the confidence intervals and the confidence bands.</p></li>
+<li><p><strong>diff</strong> (<em>bool, default=False</em>) – If True, the time series data is differenced and the differenced time series is used for autocorrelogram and output.</p></li>
+<li><p><strong>alpha</strong> (<em>float, default=0.05</em>) – Significance level for the confidence intervals and the confidence bands.</p></li>
 </ul>
 </dd>
 </dl>
@@ -141,13 +141,13 @@ If false, the usual regression is used for the estimating equation.</p></li>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>CI_HAC</strong> (<em>bool</em><em>, </em><em>default=True</em>) – Whether to plot HAC robust confidence intervals.</p></li>
-<li><p><strong>CB_HAC</strong> (<em>bool</em><em>, </em><em>default=False</em>) – Whether to plot HAC robust confidence bands.</p></li>
-<li><p><strong>CB_stata</strong> (<em>bool</em><em>, </em><em>default=False</em>) – Whether to plot the Stata confidence bands.</p></li>
-<li><p><strong>CB_bart</strong> (<em>bool</em><em>, </em><em>default=False</em>) – Whether to plot the Bartlett confidence bands.</p></li>
-<li><p><strong>title</strong> (<em>str</em><em>, </em><em>default='Autocorrelogram with HAC robust CI'</em>) – Title for the plot.</p></li>
-<li><p><strong>save_as_pdf</strong> (<em>bool</em><em>, </em><em>default=False</em>) – If True, save the plot as a PDF, otherwise display it.</p></li>
-<li><p><strong>filename</strong> (<em>str</em><em>, </em><em>default='autocorrelogram.pdf'</em>) – Filename for saving the plot if save_as_pdf is True.</p></li>
+<li><p><strong>CI_HAC</strong> (<em>bool, default=True</em>) – Whether to plot HAC robust confidence intervals.</p></li>
+<li><p><strong>CB_HAC</strong> (<em>bool, default=False</em>) – Whether to plot HAC robust confidence bands.</p></li>
+<li><p><strong>CB_stata</strong> (<em>bool, default=False</em>) – Whether to plot the Stata confidence bands.</p></li>
+<li><p><strong>CB_bart</strong> (<em>bool, default=False</em>) – Whether to plot the Bartlett confidence bands.</p></li>
+<li><p><strong>title</strong> (<em>str, default=’Autocorrelogram with HAC robust CI’</em>) – Title for the plot.</p></li>
+<li><p><strong>save_as_pdf</strong> (<em>bool, default=False</em>) – If True, save the plot as a PDF, otherwise display it.</p></li>
+<li><p><strong>filename</strong> (<em>str, default=’autocorrelogram.pdf’</em>) – Filename for saving the plot if save_as_pdf is True.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
