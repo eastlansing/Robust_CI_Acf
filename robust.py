@@ -7,15 +7,28 @@ import cmath
 class HAC_robust_conf_int:
 
     """
-    Implements the Heteroskedasticity and Autocorrelation Consistent (HAC) robust confidence intervals for autocorrelation functions.
+    The base class for the implementation of the Heteroskedasticity and Autocorrelation Consistent (HAC) robust confidence intervals 
+    for autocorrelation functions across lags for (covariance) stationary time series in Hwang and Vogelsang (2023). 
+    Our method provides valid inference for autocorrelation functions.
+    It is pointed out that Bartlett formula on which the widely used statistical packages (Stata, SAS, R, Matlab and etc..) are relying
+    for inference for autocorrelation function is no longer valid when the assumption of i.i.d innovations is relaxed. In contrast, 
+    our method implemented here is robust to three aspects: weak white noise, asymmetric innovations, and model misspecification as our approach does not require an assumption 
+    about the model for the data generating process.
+
+    We provide vaild confidence intervals and confidence bands for inference about autocorrelation function in this Python package.
+    This class and following methods provide a graph of autocorrelogram with the estimated autocorrelation functions and 
+    the valid confidence intervals by Hwang and Vogelsang (2023) across multiple lags for your time series data 
+    so that empirical practitioners can easily obtain valid confidence intervals (and confidence bands) for empirical anaylsis of time series data.
+
 
     Parameters
     ----------
+    
     data : array-like
-        The input data series for which the HAC robust confidence intervals are to be calculated.
+        The input time series for which the HAC robust confidence intervals are to be calculated.
     
     lag : int
-        The maximum lag to be considered for autocorrelation.
+        The maximum lag to be considered for autocorrelation functions.
     
     null_imp : bool, default=True
         Indicates if the null hypothesis of no importance should be considered.
@@ -23,17 +36,20 @@ class HAC_robust_conf_int:
     method : str, default='fixedb'
         The method used for estimation.
     
-    bandwidth : str, default="SPJ"
-        Specifies the bandwidth method used in the estimation.
+    bandwidth : {"SPJ", "AD"}, default="SPJ"
+        Specifies the data dependent bandwidth selection method used in the estimation. "SPJ" is a testing optimal data depdendent bandwidth selection method
+        suggested in Sun, Phillips and Jin (2008). "AD" is a MSE optimal method by Andrews (1991).
     
     time_trend : bool, default=False
-        If True, a time trend is considered in the model.
+        If True, a time trend is considered in the estimating equation. To be able to obtain bandwidth by the data dependent selection methods,
+        we use Frisch–Waugh–Lovell theorem to partial out the time trend and obtain the residuals for the bandwidth calculation, instead of full regression.
+        If false, the usual regression is used for the estimating equation.
     
     diff : bool, default=False
-        If True, calculates the difference series of the data.
+        If True, the time series data is differenced and the differenced time series is used for autocorrelogram and output.
     
     alpha : float, default=0.05
-        Significance level for the confidence interval.
+        Significance level for the confidence intervals and the confidence bands.
 
     Note
     ----
@@ -441,6 +457,7 @@ class HAC_robust_conf_int:
 
         Returns
         -------
+        
         list of float
             List of estimated ACF values.
         """
@@ -453,6 +470,7 @@ class HAC_robust_conf_int:
 
         Returns
         -------
+        
         tuple of list of float
             Lower and upper confidence interval bounds for each ACF value.
         """
@@ -469,6 +487,7 @@ class HAC_robust_conf_int:
 
         Returns
         -------
+        
         tuple of list of float
             Lower and upper confidence band bounds for each ACF value.
         """
@@ -487,6 +506,7 @@ class HAC_robust_conf_int:
 
         Returns
         -------
+        
         list of int or None
             List of index values if null is imposed; otherwise, print a message and return None.
         """
@@ -501,6 +521,7 @@ class HAC_robust_conf_int:
 
         Returns
         -------
+        
         tuple of list of float
             Lower and upper Stata-based confidence band bounds for each ACF value.
         """
@@ -515,6 +536,7 @@ class HAC_robust_conf_int:
 
         Returns
         -------
+        
         list of float
             List of critical values.
         """
@@ -526,6 +548,7 @@ class HAC_robust_conf_int:
 
         Returns
         -------
+        
         list of float
             List of sample autocorrelation values.
         """
