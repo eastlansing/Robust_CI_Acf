@@ -28,7 +28,8 @@ extensions = [
 napoleon_google_docstring = False
 napoleon_use_param = False
 napoleon_use_ivar = True
-
+napoleon_use_rtype = False  # Use inline type hinting
+napoleon_numpy_docstring = True  # Use numpydoc style
 
 # Mock imports that might not be available during the documentation build
 autodoc_mock_imports = ["numpy", "matplotlib", "scipy", "copy", "cmath"]
