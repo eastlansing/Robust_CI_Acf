@@ -268,7 +268,7 @@ class HAC_robust_conf_int:
 
         Notes
         -----
-        This method selects the appropriate sub-routine for plotting based on the null_imp attribute.
+        This method plots autocorrelogram with confidence intervals and confidence bands
         """
 
         if self.null_imp:
