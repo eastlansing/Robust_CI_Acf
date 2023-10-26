@@ -88,21 +88,21 @@
 <span class="sd">    the valid confidence intervals by Hwang and Vogelsang (2023) across multiple lags for your time series data </span>
 <span class="sd">    so that empirical practitioners can easily obtain valid confidence intervals (and confidence bands) for empirical anaylsis of time series data.</span>
 
-
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    </span>
 <span class="sd">    data : array-like</span>
-<span class="sd">        The input time series for which the HAC robust confidence intervals are to be calculated.</span>
+<span class="sd">        The input time series data.</span>
 <span class="sd">    </span>
 <span class="sd">    lag : int</span>
 <span class="sd">        The maximum lag to be considered for autocorrelation functions.</span>
 <span class="sd">    </span>
 <span class="sd">    null_imp : bool, default=True</span>
-<span class="sd">        Indicates if the null hypothesis of no importance should be considered.</span>
+<span class="sd">        If true, the null imposed variance estimator is used for inference. If false, then it uses the null not imposed variance estimator. For null imposed</span>
+<span class="sd">        and null not imposed estimators, see Lazarus, Lewis, Stock and Watson (2018).</span>
 <span class="sd">    </span>
-<span class="sd">    method : str, default=&#39;fixedb&#39;</span>
-<span class="sd">        The method used for estimation.</span>
+<span class="sd">    method : {&quot;fixedb&quot;, &quot;OS&quot;, &quot;normal&quot;}, default=&#39;fixedb&#39;</span>
+<span class="sd">        The asymptotics and the following critical values used for estimation.</span>
 <span class="sd">    </span>
 <span class="sd">    bandwidth : {&quot;SPJ&quot;, &quot;AD&quot;}, default=&quot;SPJ&quot;</span>
 <span class="sd">        Specifies the data dependent bandwidth selection method used in the estimation. &quot;SPJ&quot; is a testing optimal data depdendent bandwidth selection method</span>
@@ -121,7 +121,7 @@
 
 <span class="sd">    Note</span>
 <span class="sd">    ----</span>
-<span class="sd">    The provided options are for demonstration purposes and may need further refinement.</span>
+<span class="sd">    The provided options may need further refinement.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -309,7 +309,7 @@
 
 <div class="viewcode-block" id="HAC_robust_conf_int.plot_acf"><a class="viewcode-back" href="../module_robust.html#robust.HAC_robust_conf_int.plot_acf">[docs]</a>    <span class="k">def</span> <span class="nf">plot_acf</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">CI_HAC</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">CB_HAC</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">CB_stata</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">CB_bart</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Autocorrelogram with HAC robust CI&quot;</span><span class="p">,</span> <span class="n">save_as_pdf</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="s2">&quot;autocorrelogram.pdf&quot;</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Plot the autocorrelation function (ACF).</span>
+<span class="sd">        Plot the autocorrelation functions (ACF).</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -321,13 +321,14 @@
 <span class="sd">            Whether to plot the Stata confidence bands.</span>
 <span class="sd">        CB_bart : bool, default=False</span>
 <span class="sd">            Whether to plot the Bartlett confidence bands.</span>
-<span class="sd">        title : str, default=&quot;Autocorrelogram with HAC robust CI&quot;</span>
+<span class="sd">        title : str, default=&#39;Autocorrelogram with HAC robust CI&#39;</span>
 <span class="sd">            Title for the plot.</span>
 <span class="sd">        save_as_pdf : bool, default=False</span>
 <span class="sd">            If True, save the plot as a PDF, otherwise display it.</span>
-<span class="sd">        filename : str, default=&quot;autocorrelogram.pdf&quot;</span>
+<span class="sd">        filename : str, default=&#39;autocorrelogram.pdf&#39;</span>
 <span class="sd">            Filename for saving the plot if save_as_pdf is True.</span>
 
+<span class="sd">            </span>
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        fig : matplotlib.figure.Figure</span>
