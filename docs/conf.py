@@ -25,6 +25,9 @@ extensions = [
     'sphinx_rtd_theme'
 ]
 
+napoleon_google_docstring = True
+napoleon_use_param = True
+napoleon_use_ivar = True
 
 # Mock imports that might not be available during the documentation build
 autodoc_mock_imports = ["numpy", "matplotlib", "scipy", "copy", "cmath"]
@@ -33,6 +36,8 @@ autodoc_mock_imports = ["numpy", "matplotlib", "scipy", "copy", "cmath"]
 templates_path = ['_templates']
 
 # -- Options for HTML output -------------------------------------------------
+
+pygments_style = None
 
 html_theme = "sphinx_rtd_theme"
 
