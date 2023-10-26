@@ -259,8 +259,7 @@ class HAC_robust_conf_int:
             If True, save the plot as a PDF, otherwise display it.
         filename : str, default='autocorrelogram.pdf'
             Filename for saving the plot if save_as_pdf is True.
-
-            
+    
         Returns
         -------
         fig : matplotlib.figure.Figure
