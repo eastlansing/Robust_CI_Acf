@@ -25,6 +25,11 @@ extensions = [
     'sphinx_rtd_theme'
 ]
 
+napoleon_google_docstring = False
+napoleon_use_param = False
+napoleon_use_ivar = True
+
+
 # Mock imports that might not be available during the documentation build
 autodoc_mock_imports = ["numpy", "matplotlib", "scipy", "copy", "cmath"]
 
