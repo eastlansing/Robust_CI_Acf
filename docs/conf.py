@@ -26,7 +26,6 @@ extensions = [
 ]
 
 napoleon_google_docstring = True
-napoleon_numpy_docstring = False
 
 # Mock imports that might not be available during the documentation build
 autodoc_mock_imports = ["numpy", "matplotlib", "scipy", "copy", "cmath"]
