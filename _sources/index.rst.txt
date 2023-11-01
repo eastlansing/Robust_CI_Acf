@@ -3,9 +3,8 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to Robust_CI_Acf's documentation!
+Welcome to Robust_CI_Acf's documentation! |br|
 `[View Source Code] <https://eastlansing.github.io/Robust_CI_Acf/_modules/robust.html>`_
-
 =========================================
 
 This package provides a Python implementation of the HAC robust confidence interval for autocorrelation function by the working paper titled
@@ -31,4 +30,8 @@ Indices and tables
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
+
+.. |br| raw:: html
+
+   <br />
 
