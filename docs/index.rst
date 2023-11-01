@@ -3,18 +3,17 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to Robust_CI_Acf's documentation! |br|
-`[View Source Code] <https://eastlansing.github.io/Robust_CI_Acf/_modules/robust.html>`_
+.. raw:: html
 
-=========================================
+   <span style="font-size: 1.5em;">Welcome to Robust_CI_Acf's documentation!</span>
+   <br>
+   <a href="https://eastlansing.github.io/Robust_CI_Acf/_modules/robust.html" style="font-size: 1.5em;">[View Source Code]</a>
+   <br>
 
 This package provides a Python implementation of the HAC robust confidence interval for autocorrelation function by the working paper titled
 "An Estimating Equation Approach for Robust Confidence Intervals for Autocorrelations of Stationary Time Series" (Hwang and Vogelsang, 2023).
-You can read the abstract here. [Link_]
-
-.. _Link: https://www.taeyoonhwang.com/research
+You can read the abstract `here <https://www.taeyoonhwang.com/research>`_.
 The draft will be updated soon.
-
 
 .. toctree::
    :maxdepth: 2
@@ -31,8 +30,3 @@ Indices and tables
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
-
-.. |br| raw:: html
-
-   <br />
-
