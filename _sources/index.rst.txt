@@ -6,7 +6,6 @@
 
 Welcome to Robust_CI_Acf's documentation!
 =========================================
-
 `[View Source Code] <https://eastlansing.github.io/Robust_CI_Acf/_modules/robust.html>`_
 
 This package provides a Python implementation of the HAC robust confidence interval for autocorrelation function by the working paper titled
