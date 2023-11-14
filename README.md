@@ -1,6 +1,6 @@
-# Robust Confidence Interval for Autocorrelation Function
+## Robust Confidence Interval for the Autocorrelation Function
 
-Welcome to the repository for the Python implementation of a robust confidence interval for the autocorrelation function. This implementation is based on the methodology outlined in “An Estimating Equation Approach for Robust Confidence Intervals for Autocorrelations of Stationary Time Series” (Hwang and Vogelsang, 2023). The paper introduces a novel approach to construct robust confidence intervals in the context of general stationary time series.
+Welcome to the repository for the Python implementation of robust confidence interval for the autocorrelation function. This implementation is based on the methodology outlined in “An Estimating Equation Approach for Robust Confidence Intervals for Autocorrelations of Stationary Time Series” (Hwang and Vogelsang, 2023). The paper introduces a novel approach to construct robust confidence intervals in the context of general stationary time series.
 
 ## Documentation
 
