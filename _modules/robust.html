@@ -77,13 +77,12 @@
 <div class="viewcode-block" id="HAC_robust_conf_int"><a class="viewcode-back" href="../module_robust.html#robust.HAC_robust_conf_int">[docs]</a><span class="k">class</span> <span class="nc">HAC_robust_conf_int</span><span class="p">:</span>
 <span class="w">    </span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    test The base class for the implementation of the Heteroskedasticity and Autocorrelation Consistent (HAC) robust confidence intervals </span>
+<span class="sd">    The base class for the implementation of the heteroskedasticity and autocorrelation consistent (HAC) robust confidence intervals </span>
 <span class="sd">    for autocorrelation functions across lags for (covariance) stationary time series in Hwang and Vogelsang (2023). </span>
 <span class="sd">    Our method provides valid inference for autocorrelation functions.</span>
 <span class="sd">    It is pointed out that Bartlett formula on which the widely used statistical packages (Stata, SAS, R, Matlab and etc..) are relying</span>
 <span class="sd">    for inference for autocorrelation function is no longer valid when the assumption of i.i.d innovations is relaxed. In contrast, </span>
-<span class="sd">    our method implemented here is robust to three aspects: weak white noise, asymmetric innovations, and model misspecification as our approach does not require an assumption </span>
-<span class="sd">    about the model for the data generating process.</span>
+<span class="sd">    our method implemented here is robust in three ways: innovations can be weak white noise (relaxation of the i.i.d innovations assumption), innovations can have asymmetric distributions, and inference does not require a specific model of serial correlation.</span>
 
 <span class="sd">    We provide vaild confidence intervals and confidence bands for inference about autocorrelation function in this Python package.</span>
 <span class="sd">    This class and following methods provide a graph of autocorrelogram with the estimated autocorrelation functions and </span>
