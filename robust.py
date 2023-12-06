@@ -5,7 +5,7 @@ from copy import copy
 import cmath
 
 class HAC_robust_conf_int:
-
+    
     """
     The base class for the implementation of the Heteroskedasticity and Autocorrelation Consistent (HAC) robust confidence intervals 
     for autocorrelation functions across lags for (covariance) stationary time series in Hwang and Vogelsang (2023). 
@@ -56,7 +56,8 @@ class HAC_robust_conf_int:
     The provided options may need further refinement.
 
     """
-
+    
+    
     def __init__(self, data, lag, null_imp=True, method='fixedb', bandwidth="SPJ", time_trend=False, diff=False, alpha=0.05):
         self.data = np.copy(np.asarray(data).reshape(-1, 1))
         self.lag = lag
@@ -90,12 +91,12 @@ class HAC_robust_conf_int:
                 if self.time_trend:
                     rho_est, w_t, res_y_t_k = regression_residuals(data=self.data, k=k)
                     vhat_opt3 = np.copy(res_y_t_k*w_t)
-                    vhat_opt3 = vhat_opt3 - vhat_opt3.mean(axis=0)
+                    #vhat_opt3 = vhat_opt3 - vhat_opt3.mean(axis=0)
                 else:
                     y, x, nmp, X, coeffs = reg_estimating_equation_v1(data=self.data, lag=k)  # assumed function name and arguments
                     uhat_opt3 = y - np.dot(X, coeffs)  # null is not imposed
                     vhat_opt3 = np.copy(X * uhat_opt3)
-                    vhat_opt3 = vhat_opt3 - vhat_opt3.mean(axis=0)
+                    #vhat_opt3 = vhat_opt3 - vhat_opt3.mean(axis=0)
                     rho_est = coeffs[1]
 
                 # method and bandwidth processing
@@ -209,6 +210,36 @@ class HAC_robust_conf_int:
                 self.var_unres_values.append(np.float64(var_unres))
                 
     
+    #def _calculate_var_res_under_zero(self, k):
+    #    """
+    #    Calculates the variance estimator under null imposed for a given lag.
+    #    
+    #    Parameters:
+    #    - k (int): The lag order for the regression estimating equation.
+    #    
+    #    Returns:
+    #    - var_res_under_zero11 (float): The element at index (1,1) of the variance estimates under null imposed.
+
+    #    """
+        
+    #    y_z, x_z, nmp_z, X_z, coeffs_z = reg_estimating_equation_v1(data=self.data, lag=k)
+    #    null_val = 0
+    #    uhat_z = (y_z - np.mean(y_z)) - null_val*(x_z - np.mean(x_z))
+    #    vhat_z = np.copy(X_z*uhat_z)
+    #    vhat_z = vhat_z - vhat_z.mean(axis=0)  # Stock Watson demeaning
+    #  
+    #    if self.bandwidth == "SPJ":
+    #        spj_function = create_spj_function(w=10)
+    #        M_n_z = spj_function(vhat_z)
+    #    elif self.bandwidth == "AD":
+    #        M_n_z = AD_band(vhat_z)
+        
+    #    fixedb_coeffs = [0.43754, 0.11912, 0.08640, 0.49629, -0.57879, 0.43266, 0.02543, -0.02379, -0.02376]
+    #    _, var_res_under_zero = process_var_fixedbcv_alpha(vhat_z, M_n_z, X_z, len(X_z), fixedb_coeffs, self.alpha)
+    #    var_res_under_zero11 = var_res_under_zero[1,1]
+
+    #    return var_res_under_zero11
+    
     def _calculate_var_res_under_zero(self, k):
         """
         Calculates the variance estimator under null imposed for a given lag.
@@ -221,6 +252,10 @@ class HAC_robust_conf_int:
 
         """
         
+        y_band, x_band, nmp_band, X_band, coeffs_band = reg_estimating_equation_v1(data=self.data, lag=k)  # assumed function name and arguments
+        uhat_opt_band = y_band - np.dot(X_band, coeffs_band)  # null is not imposed
+        vhat_opt_band = np.copy(X_band * uhat_opt_band)
+        
         y_z, x_z, nmp_z, X_z, coeffs_z = reg_estimating_equation_v1(data=self.data, lag=k)
         null_val = 0
         uhat_z = (y_z - np.mean(y_z)) - null_val*(x_z - np.mean(x_z))
@@ -229,9 +264,9 @@ class HAC_robust_conf_int:
 
         if self.bandwidth == "SPJ":
             spj_function = create_spj_function(w=10)
-            M_n_z = spj_function(vhat_z)
+            M_n_z = spj_function(vhat_opt_band)
         elif self.bandwidth == "AD":
-            M_n_z = AD_band(vhat_z)
+            M_n_z = AD_band(vhat_opt_band)
         
         fixedb_coeffs = [0.43754, 0.11912, 0.08640, 0.49629, -0.57879, 0.43266, 0.02543, -0.02379, -0.02376]
         _, var_res_under_zero = process_var_fixedbcv_alpha(vhat_z, M_n_z, X_z, len(X_z), fixedb_coeffs, self.alpha)
@@ -268,8 +303,8 @@ class HAC_robust_conf_int:
         Notes
         -----
         This method plots autocorrelogram with confidence intervals and confidence bands
-        """
-
+        """        
+        
         if self.null_imp:
             self._plot_acf_null_imp(CI_HAC, CB_HAC, CB_stata, CB_bart, title, save_as_pdf, filename)
         else:
@@ -322,8 +357,8 @@ class HAC_robust_conf_int:
     def _plot_acf_null_imp(self, CI_HAC, CB_HAC, CB_stata, CB_bart, title, save_as_pdf, filename):
         lags = range(1, len(self.rho_est_values) + 1)
         fig, ax = plt.subplots(figsize=(10, 6))
-
-        ax.vlines(lags, [0], self.rho_est_values, colors='blue', lw=2)
+        
+        #ax.vlines(lags, [0], self.rho_est_values, colors='blue', lw=2) # blue bar
         ax.plot(lags, self.rho_est_values, 'o', color='blue', label = 'Estimated Autocorrelation')
 
         ax.axhline(0, color='black', lw=0.5)
@@ -374,7 +409,7 @@ class HAC_robust_conf_int:
             ax.axhline(conf_value, color='red', linestyle='dashed', lw=0.8)
             ax.axhline(-conf_value, color='red', linestyle='dashed', lw=0.8, label='Confidence Band - Bartlett Formula')
         
-        ax.set_xlabel('Lag')
+        ax.set_xlabel('$k$ (Lag)')
         ax.set_ylabel('Estimated Autocorrelation')
         ax.set_title(title)
         ax.legend(fontsize=8, loc='upper right', framealpha=0.25)
@@ -390,7 +425,7 @@ class HAC_robust_conf_int:
         lags = range(1, len(self.rho_est_values) + 1)
         fig, ax = plt.subplots(figsize=(10, 6))
 
-        ax.vlines(lags, [0], self.rho_est_values, colors='blue', lw=2)
+        #ax.vlines(lags, [0], self.rho_est_values, colors='blue', lw=2) # blue bar
         ax.plot(lags, self.rho_est_values, 'o', color='blue', label = 'Estimated Autocorrelation')
         ax.axhline(0, color='black', lw=0.5)
 
