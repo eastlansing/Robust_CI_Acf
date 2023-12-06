@@ -7,13 +7,12 @@ import cmath
 class HAC_robust_conf_int:
     
     """
-    test The base class for the implementation of the Heteroskedasticity and Autocorrelation Consistent (HAC) robust confidence intervals 
+    The base class for the implementation of the heteroskedasticity and autocorrelation consistent (HAC) robust confidence intervals 
     for autocorrelation functions across lags for (covariance) stationary time series in Hwang and Vogelsang (2023). 
     Our method provides valid inference for autocorrelation functions.
     It is pointed out that Bartlett formula on which the widely used statistical packages (Stata, SAS, R, Matlab and etc..) are relying
     for inference for autocorrelation function is no longer valid when the assumption of i.i.d innovations is relaxed. In contrast, 
-    our method implemented here is robust to three aspects: weak white noise, asymmetric innovations, and model misspecification as our approach does not require an assumption 
-    about the model for the data generating process.
+    our method implemented here is robust in three ways: innovations can be weak white noise (relaxation of the i.i.d innovations assumption), innovations can have asymmetric distributions, and inference does not require a specific model of serial correlation.
 
     We provide vaild confidence intervals and confidence bands for inference about autocorrelation function in this Python package.
     This class and following methods provide a graph of autocorrelogram with the estimated autocorrelation functions and 
