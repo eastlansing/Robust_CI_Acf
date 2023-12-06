@@ -7,7 +7,7 @@ import cmath
 class HAC_robust_conf_int:
     
     """
-    The base class for the implementation of the Heteroskedasticity and Autocorrelation Consistent (HAC) robust confidence intervals 
+    test The base class for the implementation of the Heteroskedasticity and Autocorrelation Consistent (HAC) robust confidence intervals 
     for autocorrelation functions across lags for (covariance) stationary time series in Hwang and Vogelsang (2023). 
     Our method provides valid inference for autocorrelation functions.
     It is pointed out that Bartlett formula on which the widely used statistical packages (Stata, SAS, R, Matlab and etc..) are relying
