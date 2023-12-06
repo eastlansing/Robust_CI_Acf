@@ -75,7 +75,7 @@
 <span class="kn">import</span> <span class="nn">cmath</span>
 
 <div class="viewcode-block" id="HAC_robust_conf_int"><a class="viewcode-back" href="../module_robust.html#robust.HAC_robust_conf_int">[docs]</a><span class="k">class</span> <span class="nc">HAC_robust_conf_int</span><span class="p">:</span>
-
+<span class="w">    </span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    The base class for the implementation of the Heteroskedasticity and Autocorrelation Consistent (HAC) robust confidence intervals </span>
 <span class="sd">    for autocorrelation functions across lags for (covariance) stationary time series in Hwang and Vogelsang (2023). </span>
@@ -126,7 +126,8 @@
 <span class="sd">    The provided options may need further refinement.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-
+    
+    
 <div class="viewcode-block" id="HAC_robust_conf_int.__init__"><a class="viewcode-back" href="../module_robust.html#robust.HAC_robust_conf_int.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">lag</span><span class="p">,</span> <span class="n">null_imp</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;fixedb&#39;</span><span class="p">,</span> <span class="n">bandwidth</span><span class="o">=</span><span class="s2">&quot;SPJ&quot;</span><span class="p">,</span> <span class="n">time_trend</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">diff</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.05</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">data</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">lag</span> <span class="o">=</span> <span class="n">lag</span>
@@ -160,12 +161,12 @@
                 <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">time_trend</span><span class="p">:</span>
                     <span class="n">rho_est</span><span class="p">,</span> <span class="n">w_t</span><span class="p">,</span> <span class="n">res_y_t_k</span> <span class="o">=</span> <span class="n">regression_residuals</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="n">k</span><span class="p">)</span>
                     <span class="n">vhat_opt3</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">res_y_t_k</span><span class="o">*</span><span class="n">w_t</span><span class="p">)</span>
-                    <span class="n">vhat_opt3</span> <span class="o">=</span> <span class="n">vhat_opt3</span> <span class="o">-</span> <span class="n">vhat_opt3</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+                    <span class="c1">#vhat_opt3 = vhat_opt3 - vhat_opt3.mean(axis=0)</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">nmp</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">coeffs</span> <span class="o">=</span> <span class="n">reg_estimating_equation_v1</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">lag</span><span class="o">=</span><span class="n">k</span><span class="p">)</span>  <span class="c1"># assumed function name and arguments</span>
                     <span class="n">uhat_opt3</span> <span class="o">=</span> <span class="n">y</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">coeffs</span><span class="p">)</span>  <span class="c1"># null is not imposed</span>
                     <span class="n">vhat_opt3</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">X</span> <span class="o">*</span> <span class="n">uhat_opt3</span><span class="p">)</span>
-                    <span class="n">vhat_opt3</span> <span class="o">=</span> <span class="n">vhat_opt3</span> <span class="o">-</span> <span class="n">vhat_opt3</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+                    <span class="c1">#vhat_opt3 = vhat_opt3 - vhat_opt3.mean(axis=0)</span>
                     <span class="n">rho_est</span> <span class="o">=</span> <span class="n">coeffs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
 
                 <span class="c1"># method and bandwidth processing</span>
@@ -279,6 +280,36 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">var_unres_values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="n">var_unres</span><span class="p">))</span>
                 
     
+    <span class="c1">#def _calculate_var_res_under_zero(self, k):</span>
+    <span class="c1">#    &quot;&quot;&quot;</span>
+    <span class="c1">#    Calculates the variance estimator under null imposed for a given lag.</span>
+    <span class="c1">#    </span>
+    <span class="c1">#    Parameters:</span>
+    <span class="c1">#    - k (int): The lag order for the regression estimating equation.</span>
+    <span class="c1">#    </span>
+    <span class="c1">#    Returns:</span>
+    <span class="c1">#    - var_res_under_zero11 (float): The element at index (1,1) of the variance estimates under null imposed.</span>
+
+    <span class="c1">#    &quot;&quot;&quot;</span>
+        
+    <span class="c1">#    y_z, x_z, nmp_z, X_z, coeffs_z = reg_estimating_equation_v1(data=self.data, lag=k)</span>
+    <span class="c1">#    null_val = 0</span>
+    <span class="c1">#    uhat_z = (y_z - np.mean(y_z)) - null_val*(x_z - np.mean(x_z))</span>
+    <span class="c1">#    vhat_z = np.copy(X_z*uhat_z)</span>
+    <span class="c1">#    vhat_z = vhat_z - vhat_z.mean(axis=0)  # Stock Watson demeaning</span>
+    <span class="c1">#  </span>
+    <span class="c1">#    if self.bandwidth == &quot;SPJ&quot;:</span>
+    <span class="c1">#        spj_function = create_spj_function(w=10)</span>
+    <span class="c1">#        M_n_z = spj_function(vhat_z)</span>
+    <span class="c1">#    elif self.bandwidth == &quot;AD&quot;:</span>
+    <span class="c1">#        M_n_z = AD_band(vhat_z)</span>
+        
+    <span class="c1">#    fixedb_coeffs = [0.43754, 0.11912, 0.08640, 0.49629, -0.57879, 0.43266, 0.02543, -0.02379, -0.02376]</span>
+    <span class="c1">#    _, var_res_under_zero = process_var_fixedbcv_alpha(vhat_z, M_n_z, X_z, len(X_z), fixedb_coeffs, self.alpha)</span>
+    <span class="c1">#    var_res_under_zero11 = var_res_under_zero[1,1]</span>
+
+    <span class="c1">#    return var_res_under_zero11</span>
+    
     <span class="k">def</span> <span class="nf">_calculate_var_res_under_zero</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Calculates the variance estimator under null imposed for a given lag.</span>
@@ -291,6 +322,10 @@
 
 <span class="sd">        &quot;&quot;&quot;</span>
         
+        <span class="n">y_band</span><span class="p">,</span> <span class="n">x_band</span><span class="p">,</span> <span class="n">nmp_band</span><span class="p">,</span> <span class="n">X_band</span><span class="p">,</span> <span class="n">coeffs_band</span> <span class="o">=</span> <span class="n">reg_estimating_equation_v1</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">lag</span><span class="o">=</span><span class="n">k</span><span class="p">)</span>  <span class="c1"># assumed function name and arguments</span>
+        <span class="n">uhat_opt_band</span> <span class="o">=</span> <span class="n">y_band</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">X_band</span><span class="p">,</span> <span class="n">coeffs_band</span><span class="p">)</span>  <span class="c1"># null is not imposed</span>
+        <span class="n">vhat_opt_band</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">X_band</span> <span class="o">*</span> <span class="n">uhat_opt_band</span><span class="p">)</span>
+        
         <span class="n">y_z</span><span class="p">,</span> <span class="n">x_z</span><span class="p">,</span> <span class="n">nmp_z</span><span class="p">,</span> <span class="n">X_z</span><span class="p">,</span> <span class="n">coeffs_z</span> <span class="o">=</span> <span class="n">reg_estimating_equation_v1</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">lag</span><span class="o">=</span><span class="n">k</span><span class="p">)</span>
         <span class="n">null_val</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="n">uhat_z</span> <span class="o">=</span> <span class="p">(</span><span class="n">y_z</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">y_z</span><span class="p">))</span> <span class="o">-</span> <span class="n">null_val</span><span class="o">*</span><span class="p">(</span><span class="n">x_z</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">x_z</span><span class="p">))</span>
@@ -299,9 +334,9 @@
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">bandwidth</span> <span class="o">==</span> <span class="s2">&quot;SPJ&quot;</span><span class="p">:</span>
             <span class="n">spj_function</span> <span class="o">=</span> <span class="n">create_spj_function</span><span class="p">(</span><span class="n">w</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
-            <span class="n">M_n_z</span> <span class="o">=</span> <span class="n">spj_function</span><span class="p">(</span><span class="n">vhat_z</span><span class="p">)</span>
+            <span class="n">M_n_z</span> <span class="o">=</span> <span class="n">spj_function</span><span class="p">(</span><span class="n">vhat_opt_band</span><span class="p">)</span>
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">bandwidth</span> <span class="o">==</span> <span class="s2">&quot;AD&quot;</span><span class="p">:</span>
-            <span class="n">M_n_z</span> <span class="o">=</span> <span class="n">AD_band</span><span class="p">(</span><span class="n">vhat_z</span><span class="p">)</span>
+            <span class="n">M_n_z</span> <span class="o">=</span> <span class="n">AD_band</span><span class="p">(</span><span class="n">vhat_opt_band</span><span class="p">)</span>
         
         <span class="n">fixedb_coeffs</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.43754</span><span class="p">,</span> <span class="mf">0.11912</span><span class="p">,</span> <span class="mf">0.08640</span><span class="p">,</span> <span class="mf">0.49629</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.57879</span><span class="p">,</span> <span class="mf">0.43266</span><span class="p">,</span> <span class="mf">0.02543</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.02379</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.02376</span><span class="p">]</span>
         <span class="n">_</span><span class="p">,</span> <span class="n">var_res_under_zero</span> <span class="o">=</span> <span class="n">process_var_fixedbcv_alpha</span><span class="p">(</span><span class="n">vhat_z</span><span class="p">,</span> <span class="n">M_n_z</span><span class="p">,</span> <span class="n">X_z</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">X_z</span><span class="p">),</span> <span class="n">fixedb_coeffs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">alpha</span><span class="p">)</span>
@@ -338,8 +373,8 @@
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
 <span class="sd">        This method plots autocorrelogram with confidence intervals and confidence bands</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-
+<span class="sd">        &quot;&quot;&quot;</span>        
+        
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">null_imp</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_plot_acf_null_imp</span><span class="p">(</span><span class="n">CI_HAC</span><span class="p">,</span> <span class="n">CB_HAC</span><span class="p">,</span> <span class="n">CB_stata</span><span class="p">,</span> <span class="n">CB_bart</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">save_as_pdf</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
@@ -392,8 +427,8 @@
     <span class="k">def</span> <span class="nf">_plot_acf_null_imp</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">CI_HAC</span><span class="p">,</span> <span class="n">CB_HAC</span><span class="p">,</span> <span class="n">CB_stata</span><span class="p">,</span> <span class="n">CB_bart</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">save_as_pdf</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
         <span class="n">lags</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rho_est_values</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
         <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
-
-        <span class="n">ax</span><span class="o">.</span><span class="n">vlines</span><span class="p">(</span><span class="n">lags</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">rho_est_values</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="s1">&#39;blue&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        
+        <span class="c1">#ax.vlines(lags, [0], self.rho_est_values, colors=&#39;blue&#39;, lw=2) # blue bar</span>
         <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">lags</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">rho_est_values</span><span class="p">,</span> <span class="s1">&#39;o&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;blue&#39;</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span> <span class="s1">&#39;Estimated Autocorrelation&#39;</span><span class="p">)</span>
 
         <span class="n">ax</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
@@ -444,7 +479,7 @@
             <span class="n">ax</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="n">conf_value</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;dashed&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mf">0.8</span><span class="p">)</span>
             <span class="n">ax</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="o">-</span><span class="n">conf_value</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;dashed&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Confidence Band - Bartlett Formula&#39;</span><span class="p">)</span>
         
-        <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Lag&#39;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;$k$ (Lag)&#39;</span><span class="p">)</span>
         <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Estimated Autocorrelation&#39;</span><span class="p">)</span>
         <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">title</span><span class="p">)</span>
         <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">loc</span><span class="o">=</span><span class="s1">&#39;upper right&#39;</span><span class="p">,</span> <span class="n">framealpha</span><span class="o">=</span><span class="mf">0.25</span><span class="p">)</span>
@@ -460,7 +495,7 @@
         <span class="n">lags</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rho_est_values</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
         <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
 
-        <span class="n">ax</span><span class="o">.</span><span class="n">vlines</span><span class="p">(</span><span class="n">lags</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">rho_est_values</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="s1">&#39;blue&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="c1">#ax.vlines(lags, [0], self.rho_est_values, colors=&#39;blue&#39;, lw=2) # blue bar</span>
         <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">lags</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">rho_est_values</span><span class="p">,</span> <span class="s1">&#39;o&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;blue&#39;</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span> <span class="s1">&#39;Estimated Autocorrelation&#39;</span><span class="p">)</span>
         <span class="n">ax</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
 
