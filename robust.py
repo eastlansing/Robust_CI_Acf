@@ -487,7 +487,7 @@ class HAC_robust_conf_int:
             
     def get_estimated_acf(self):
         """
-        Retrieve the estimated autocorrelation function values.
+        Retrieve the estimated autocorrelation function values by the estimating equation approach in Hwang and Vogelsang (2023).
 
         Returns
         -------
@@ -500,7 +500,7 @@ class HAC_robust_conf_int:
     
     def get_confidence_interval(self):
         """
-        Compute the confidence intervals for the ACF values.
+        Compute the confidence intervals for the ACF values by the estimating equation approach with the options pre-defined in the class.
 
         Returns
         -------
@@ -517,7 +517,7 @@ class HAC_robust_conf_int:
         
     def get_confidence_band(self):
         """
-        Compute the confidence bands around zero for the ACF values.
+        Compute the confidence bands around zero for the ACF values by the estimating equation approach with the options pre-defined in the class.
 
         Returns
         -------
@@ -536,7 +536,7 @@ class HAC_robust_conf_int:
         
     def get_null_imp_index(self):
         """
-        Retrieve the index values if the null is imposed.
+        Retrieve the index values (indicating the solution types of the quadractic equation across lags) if the null is imposed.
 
         Returns
         -------
@@ -551,13 +551,13 @@ class HAC_robust_conf_int:
     
     def get_cb_stata(self):
         """
-        Compute the Stata-based confidence bands for the ACF values.
+        Compute the confidence bands suggested by Stata for the sample ACF values.
 
         Returns
         -------
         
         tuple of list of float
-            Lower and upper Stata-based confidence band bounds for each ACF value.
+            Lower and upper confidence band bounds by Stata for each sample ACF value.
         """
         var_stata = self._calculate_var_stata_ori()
         upper_bounds = [0 + stats.norm.ppf(1 - self.alpha / 2) * np.sqrt(var) for var in var_stata]
@@ -566,7 +566,7 @@ class HAC_robust_conf_int:
     
     def get_cv(self):
         """
-        Retrieve the critical values used for confidence interval calculations.
+        Retrieve the critical values used for confidence interval calculations based on the estimating equation approach.
 
         Returns
         -------
