@@ -557,7 +557,7 @@
             
 <div class="viewcode-block" id="HAC_robust_conf_int.get_estimated_acf"><a class="viewcode-back" href="../module_robust.html#robust.HAC_robust_conf_int.get_estimated_acf">[docs]</a>    <span class="k">def</span> <span class="nf">get_estimated_acf</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Retrieve the estimated autocorrelation function values.</span>
+<span class="sd">        Retrieve the estimated autocorrelation function values by the estimating equation approach in Hwang and Vogelsang (2023).</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -570,7 +570,7 @@
     
 <div class="viewcode-block" id="HAC_robust_conf_int.get_confidence_interval"><a class="viewcode-back" href="../module_robust.html#robust.HAC_robust_conf_int.get_confidence_interval">[docs]</a>    <span class="k">def</span> <span class="nf">get_confidence_interval</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Compute the confidence intervals for the ACF values.</span>
+<span class="sd">        Compute the confidence intervals for the ACF values by the estimating equation approach with the options pre-defined in the class.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -587,7 +587,7 @@
         
 <div class="viewcode-block" id="HAC_robust_conf_int.get_confidence_band"><a class="viewcode-back" href="../module_robust.html#robust.HAC_robust_conf_int.get_confidence_band">[docs]</a>    <span class="k">def</span> <span class="nf">get_confidence_band</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Compute the confidence bands around zero for the ACF values.</span>
+<span class="sd">        Compute the confidence bands around zero for the ACF values by the estimating equation approach with the options pre-defined in the class.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -606,7 +606,7 @@
         
 <div class="viewcode-block" id="HAC_robust_conf_int.get_null_imp_index"><a class="viewcode-back" href="../module_robust.html#robust.HAC_robust_conf_int.get_null_imp_index">[docs]</a>    <span class="k">def</span> <span class="nf">get_null_imp_index</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Retrieve the index values if the null is imposed.</span>
+<span class="sd">        Retrieve the index values (indicating the solution types of the quadractic equation across lags) if the null is imposed.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -621,13 +621,13 @@
     
 <div class="viewcode-block" id="HAC_robust_conf_int.get_cb_stata"><a class="viewcode-back" href="../module_robust.html#robust.HAC_robust_conf_int.get_cb_stata">[docs]</a>    <span class="k">def</span> <span class="nf">get_cb_stata</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Compute the Stata-based confidence bands for the ACF values.</span>
+<span class="sd">        Compute the confidence bands suggested by Stata for the sample ACF values.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        </span>
 <span class="sd">        tuple of list of float</span>
-<span class="sd">            Lower and upper Stata-based confidence band bounds for each ACF value.</span>
+<span class="sd">            Lower and upper confidence band bounds by Stata for each sample ACF value.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">var_stata</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_calculate_var_stata_ori</span><span class="p">()</span>
         <span class="n">upper_bounds</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span> <span class="o">+</span> <span class="n">stats</span><span class="o">.</span><span class="n">norm</span><span class="o">.</span><span class="n">ppf</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">alpha</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">var</span><span class="p">)</span> <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">var_stata</span><span class="p">]</span>
@@ -636,7 +636,7 @@
     
 <div class="viewcode-block" id="HAC_robust_conf_int.get_cv"><a class="viewcode-back" href="../module_robust.html#robust.HAC_robust_conf_int.get_cv">[docs]</a>    <span class="k">def</span> <span class="nf">get_cv</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Retrieve the critical values used for confidence interval calculations.</span>
+<span class="sd">        Retrieve the critical values used for confidence interval calculations based on the estimating equation approach.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
