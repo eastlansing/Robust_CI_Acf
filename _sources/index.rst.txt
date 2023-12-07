@@ -10,9 +10,12 @@ Welcome to Robust_CI_Acf's documentation!
 
 This package provides a Pythonimp lementation of the HAC robust confidence interval for autocorrelation function by the working paper titled
 "An Estimating Equation Approach for Robust Confidence Intervals for Autocorrelations of Stationary Time Series" (Hwang and Vogelsang, 2023).
-You can read the working paper here. [PaperLink_]
+
+For details about the theory and its empirical applications, please refer to our working paper, available here: [PaperLink_]
 
 .. _PaperLink: https://taeyoonhwang.s3.us-east-2.amazonaws.com/Taeyoon_Hwang_JMP.pdf
+
+
 
 
 
